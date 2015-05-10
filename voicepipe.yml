@@ -1,0 +1,11 @@
+repository: user/nginx
+images:
+  - tag: develop
+    parameters:
+      - name: NGINX_CONF
+        value: develop.conf
+  - tag: production
+    parameters:
+      - name: NGINX_CONF
+        value: procudtion.conf
+
