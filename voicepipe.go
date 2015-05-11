@@ -29,7 +29,7 @@ type unmarshalledYaml struct {
 }
 
 func main() {
-	buf, err := ioutil.ReadFile("sample_voicepipe.yml")
+	buf, err := ioutil.ReadFile("voicepipe.yml")
 	if err != nil {
 		log.Println(err)
 		return
