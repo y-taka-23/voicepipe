@@ -3,6 +3,8 @@ VoicePipe
 
 VoicePipe builds parameterized Docker images from a single Dockerfile.
 
+[![Build Status](https://travis-ci.org/y-taka-23/voicepipe.svg)](https://travis-ci.org/y-taka-23/voicepipe)
+
 ## Example Usage
 
 Assume the following directory structure:
