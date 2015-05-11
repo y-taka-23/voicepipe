@@ -7,14 +7,14 @@ import (
 	"log"
 )
 
-type Image struct {
+type ImageDirective struct {
 	Tag        string
 	Parameters map[string]string
 }
 
 type Directive struct {
-	Repository string
-	Images     []*Image
+	Repository      string
+	ImageDirectives []*ImageDirective
 }
 
 type unmarshalledYaml struct {
@@ -43,15 +43,18 @@ func main() {
 	}
 
 	d := &Directive{
-		Repository: uy.Repository,
-		Images:     make([]*Image, 0),
+		Repository:      uy.Repository,
+		ImageDirectives: make([]*ImageDirective, 0),
 	}
 	for _, i := range uy.Images {
 		params := make(map[string]string)
 		for _, p := range i.Parameters {
 			params[p.Name] = params[p.Value]
 		}
-		d.Images = append(d.Images, &Image{Tag: i.Tag, Parameters: params})
+		d.ImageDirectives = append(
+			d.ImageDirectives,
+			&ImageDirective{Tag: i.Tag, Parameters: params},
+		)
 	}
 	fmt.Println(d)
 }
