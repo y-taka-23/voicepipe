@@ -17,7 +17,7 @@ type Directive struct {
 	ImageDirectives []*ImageDirective
 }
 
-type unmarshalledYaml struct {
+type intermediateDirective struct {
 	Repository string
 	Images     []struct {
 		Tag        string
@@ -35,18 +35,18 @@ func main() {
 		return
 	}
 
-	uy := &unmarshalledYaml{}
-	err = yaml.Unmarshal(buf, uy)
+	in := &intermediateDirective{}
+	err = yaml.Unmarshal(buf, in)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	d := &Directive{
-		Repository:      uy.Repository,
+		Repository:      in.Repository,
 		ImageDirectives: make([]*ImageDirective, 0),
 	}
-	for _, i := range uy.Images {
+	for _, i := range in.Images {
 		params := make(map[string]string)
 		for _, p := range i.Parameters {
 			params[p.Name] = params[p.Value]
