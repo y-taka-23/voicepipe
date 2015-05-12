@@ -28,24 +28,14 @@ type intermediateDirective struct {
 	}
 }
 
-func main() {
-	buf, err := ioutil.ReadFile("voicepipe.yml")
-	if err != nil {
-		log.Println(err)
-		return
+func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var in = &intermediateDirective{}
+	if err := unmarshal(in); err != nil {
+		return err
 	}
 
-	in := &intermediateDirective{}
-	err = yaml.Unmarshal(buf, in)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	d := &Directive{
-		Repository:      in.Repository,
-		ImageDirectives: make([]*ImageDirective, 0),
-	}
+	d.Repository = in.Repository
+	d.ImageDirectives = make([]*ImageDirective, 0)
 	for _, i := range in.Images {
 		params := make(map[string]string)
 		for _, p := range i.Parameters {
@@ -56,5 +46,23 @@ func main() {
 			&ImageDirective{Tag: i.Tag, Parameters: params},
 		)
 	}
+
+	return nil
+}
+
+func main() {
+	buf, err := ioutil.ReadFile("voicepipe.yml")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	var d = &Directive{}
+	err = yaml.Unmarshal(buf, d)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	fmt.Println(d)
 }
