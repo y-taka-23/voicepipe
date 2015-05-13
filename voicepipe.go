@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	//	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 type ImageDirective struct {
@@ -51,7 +52,14 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 func main() {
-	buf, err := ioutil.ReadFile("voicepipe.yml")
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	wd += "/example" // just for debug
+
+	buf, err := ioutil.ReadFile(wd + "/voicepipe.yml")
 	if err != nil {
 		log.Println(err)
 		return
@@ -64,5 +72,30 @@ func main() {
 		return
 	}
 
-	fmt.Println(d)
+	fis, err := ioutil.ReadDir(wd)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, id := range d.ImageDirectives {
+		dir := wd + "/.voicepipe/" + id.Tag
+		err = os.RemoveAll(dir)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		err = os.MkdirAll(dir, 0775)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		for _, fi := range fis {
+			err = os.Symlink(wd+"/"+fi.Name(), dir+"/"+fi.Name())
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}
 }
