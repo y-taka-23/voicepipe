@@ -11,9 +11,9 @@ Assume the following directory structure:
 
 ```
 +--- Dockerfile
-+--- conf
-|    +--- develop.conf
-|    `--- production.conf
++--- index
+|    +--- index_develop.html
+|    `--- index_production.html
 `--- voicepipe.yml
 ```
 
@@ -21,8 +21,8 @@ First, you define your application with a `Dockerfile`:
 
 ```
 FROM nginx
-ENV NGINX_CONF dummyvalue
-COPY conf/${NGINX_CONF} /etc/nginx/nginx.conf
+ENV INDEX_HTML dummyvalue
+COPY index/${INDEX_HTML} /usr/share/nginx/html/index.html
 ```
 
 Next, you define the parameters for each images in `voicepipe.yml`:
@@ -32,18 +32,18 @@ repository: user/nginx
 images:
   - tag: develop
     parameters:
-      - name: NGINX_CONF
-        value: develop.conf
+      - name: INDEX_HTML
+        value: index_develop.html
   - tag: production
     parameters:
-      - name: NGINX_CONF
-        value: procudtion.conf
+      - name: INDEX_HTML
+        value: index_production.html
 ```
 
 Finally, run `voicepipe` in the directory.
 VoicePipe will build the Docker images
 `user/nginx:develop` and `user/nginx:production`
-with the corresponding `*.conf` files.
+with the corresponding `index_*.html` files.
 
 ## Requirement
 
