@@ -1,0 +1,11 @@
+repository: user/nginx
+images:
+  - tag: develop
+    parameters:
+      - name: INDEX_HTML
+        value: index_develop.html
+  - tag: production
+    parameters:
+      - name: INDEX_HTML
+        value: index_production.html
+
