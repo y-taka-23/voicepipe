@@ -1,7 +1,7 @@
 package main
 
 import (
-	//	"fmt"
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -51,15 +51,40 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
+func SetupWorkingDir(d Directive, root string) error {
+	fis, err := ioutil.ReadDir(root)
+	if err != nil {
+		return err
+	}
+	for _, id := range d.ImageDirectives {
+		dir := root + "/.voicepipe/" + id.Tag
+		err = os.RemoveAll(dir)
+		if err != nil {
+			return err
+		}
+		err = os.MkdirAll(dir, 0775)
+		if err != nil {
+			return err
+		}
+		for _, fi := range fis {
+			err = os.Symlink(root+"/"+fi.Name(), dir+"/"+fi.Name())
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func main() {
-	wd, err := os.Getwd()
+	root, err := os.Getwd()
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	wd += "/example" // just for debug
+	root += "/example" // just for debug
 
-	buf, err := ioutil.ReadFile(wd + "/voicepipe.yml")
+	buf, err := ioutil.ReadFile(root + "/voicepipe.yml")
 	if err != nil {
 		log.Println(err)
 		return
@@ -72,30 +97,11 @@ func main() {
 		return
 	}
 
-	fis, err := ioutil.ReadDir(wd)
+	err = SetupWorkingDir(*d, root)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	for _, id := range d.ImageDirectives {
-		dir := wd + "/.voicepipe/" + id.Tag
-		err = os.RemoveAll(dir)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		err = os.MkdirAll(dir, 0775)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		for _, fi := range fis {
-			err = os.Symlink(wd+"/"+fi.Name(), dir+"/"+fi.Name())
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}
-	}
+	fmt.Println("SUCCESS")
 }
