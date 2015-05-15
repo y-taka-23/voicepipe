@@ -91,6 +91,25 @@ func SetupWorkingDir(d Directive, root string) error {
 	return nil
 }
 
+type Instruction int
+
+const (
+	FROM Instruction = iota
+	MAINTAINER
+	RUN
+	CMD
+	LABEL
+	EXPOSE
+	ENV
+	ADD
+	COPY
+	ENTRYPOINT
+	VOLUME
+	USER
+	WORKDIR
+	ONBUILD
+)
+
 func main() {
 	root, err := os.Getwd()
 	if err != nil {
