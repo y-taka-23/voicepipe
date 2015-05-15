@@ -51,8 +51,23 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
-func SetupWorkingDir(d Directive, root string) error {
+func Resources(root string) ([]os.FileInfo, error) {
+	rs := make([]os.FileInfo, 0)
 	fis, err := ioutil.ReadDir(root)
+	if err != nil {
+		return rs, err
+	}
+	for _, fi := range fis {
+		n := fi.Name()
+		if n != ".voicepipe" && n != "voicepipe.yml" && n != "Dockerfile" {
+			rs = append(rs, fi)
+		}
+	}
+	return rs, nil
+}
+
+func SetupWorkingDir(d Directive, root string) error {
+	rs, err := Resources(root)
 	if err != nil {
 		return err
 	}
@@ -66,7 +81,7 @@ func SetupWorkingDir(d Directive, root string) error {
 		if err != nil {
 			return err
 		}
-		for _, fi := range fis {
+		for _, fi := range rs {
 			err = os.Symlink(root+"/"+fi.Name(), dir+"/"+fi.Name())
 			if err != nil {
 				return err
