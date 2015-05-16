@@ -1,5 +1,11 @@
 package main
 
+type Statement interface {
+	statement()
+}
+
+type Dockerfile []*Statement
+
 type From struct {
 	Image  string
 	Tag    string
@@ -57,5 +63,20 @@ type Workdir struct {
 }
 
 type Onbuild struct {
-	// to be inplemented
+	Statement *Statement
 }
+
+func (x *From) statement()       {}
+func (x *Maintainer) statement() {}
+func (x *Run) statement()        {}
+func (x *Cmd) statement()        {}
+func (x *Lable) statement()      {}
+func (x *Expose) statement()     {}
+func (x *Env) statement()        {}
+func (x *Add) statement()        {}
+func (x *Copy) statement()       {}
+func (x *Entrypoint) statement() {}
+func (x *Volume) statement()     {}
+func (x *User) statement()       {}
+func (x *Workdir) statement()    {}
+func (x *Onbuild) statement()    {}
