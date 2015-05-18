@@ -70,7 +70,7 @@ type Workdir struct {
 }
 
 type Onbuild struct {
-	Statement *Statement
+	Statement Statement
 }
 
 func (x From) statement()       {}
