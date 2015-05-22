@@ -16,8 +16,13 @@ func TestParseMaintainer(t *testing.T) {
 	}
 	for _, c := range cases {
 		got, _ := ParseMaintainer(c.in)
-		if got != c.want {
-			t.Errorf("ParseMaintainer(%q) == %v, want %v", c.in, got, c.want)
+		if got.Name != c.want.Name {
+			t.Errorf(
+				"ParseMaintainer(%q).Name == %q, want %q",
+				c.in,
+				got.Name,
+				c.want.Name,
+			)
 		}
 	}
 }
