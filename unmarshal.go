@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strings"
+)
+
 func LogicalLines([]byte) [][]byte {
 	return nil
 }
@@ -13,7 +17,8 @@ func ParseFrom(body []byte) (*From, error) {
 }
 
 func ParseMaintainer(body []byte) (*Maintainer, error) {
-	return nil, nil
+	s := strings.TrimSpace(string(body))
+	return &Maintainer{Name: s}, nil
 }
 
 func ParseRun(body []byte) (*Run, error) {
