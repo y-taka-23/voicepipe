@@ -48,3 +48,25 @@ func TestParseUser(t *testing.T) {
 		}
 	}
 }
+
+func TestParseWorkdir(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Workdir
+	}{
+		{[]byte("/home/foo"), &Workdir{Path: "/home/foo"}},
+		{[]byte(" /home/foo"), &Workdir{Path: "/home/foo"}},
+		{[]byte("/home/foo "), &Workdir{Path: "/home/foo"}},
+	}
+	for _, c := range cases {
+		got, _ := ParseWorkdir(c.in)
+		if got.Path != c.want.Path {
+			t.Errorf(
+				"ParseWorkdir(%q).Path == %q, want %q",
+				c.in,
+				got.Path,
+				c.want.Path,
+			)
+		}
+	}
+}

@@ -63,7 +63,8 @@ func ParseUser(body []byte) (*User, error) {
 }
 
 func ParseWorkdir(body []byte) (*Workdir, error) {
-	return nil, nil
+	s := strings.TrimSpace(string(body))
+	return &Workdir{Path: s}, nil
 }
 
 func ParseOnbuild(body []byte) (*Onbuild, error) {
