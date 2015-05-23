@@ -4,6 +4,50 @@ import (
 	"testing"
 )
 
+func TestParseFrom(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *From
+	}{
+		{[]byte("ubuntu"), &From{Image: "ubuntu"}},
+		{[]byte(" ubuntu"), &From{Image: "ubuntu"}},
+		{[]byte("ubuntu "), &From{Image: "ubuntu"}},
+		{[]byte("ubuntu:14.04"), &From{Image: "ubuntu", Tag: "14.04"}},
+		{[]byte(" ubuntu:14.04"), &From{Image: "ubuntu", Tag: "14.04"}},
+		{[]byte("ubuntu:14.04 "), &From{Image: "ubuntu", Tag: "14.04"}},
+		{[]byte("ubuntu@12345"), &From{Image: "ubuntu", Digest: "12345"}},
+		{[]byte(" ubuntu@12345"), &From{Image: "ubuntu", Digest: "12345"}},
+		{[]byte("ubuntu@12345 "), &From{Image: "ubuntu", Digest: "12345"}},
+	}
+	for _, c := range cases {
+		got, _ := ParseFrom(c.in)
+		if got.Image != c.want.Image {
+			t.Errorf(
+				"ParseFrom(%q).Image == %q, want %q",
+				c.in,
+				got.Image,
+				c.want.Image,
+			)
+		}
+		if got.Tag != c.want.Tag {
+			t.Errorf(
+				"ParseFrom(%q).Tag == %q, want %q",
+				c.in,
+				got.Tag,
+				c.want.Tag,
+			)
+		}
+		if got.Digest != c.want.Digest {
+			t.Errorf(
+				"ParseFrom(%q).Digest == %q, want %q",
+				c.in,
+				got.Digest,
+				c.want.Digest,
+			)
+		}
+	}
+}
+
 func TestParseMaintainer(t *testing.T) {
 	cases := []struct {
 		in   []byte

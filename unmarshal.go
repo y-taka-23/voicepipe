@@ -13,7 +13,14 @@ func Parse(args []byte) (*Statement, error) {
 }
 
 func ParseFrom(body []byte) (*From, error) {
-	return nil, nil
+	s := strings.TrimSpace(string(body))
+	if args := strings.Split(s, "@"); len(args) >= 2 {
+		return &From{Image: args[0], Digest: args[1]}, nil
+	}
+	if args := strings.Split(s, ":"); len(args) >= 2 {
+		return &From{Image: args[0], Tag: args[1]}, nil
+	}
+	return &From{Image: s}, nil
 }
 
 func ParseMaintainer(body []byte) (*Maintainer, error) {
