@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -41,7 +43,16 @@ func ParseLable(body []byte) (*Label, error) {
 }
 
 func ParseExpose(body []byte) (*Expose, error) {
-	return nil, nil
+	args := strings.Fields(string(body))
+	var ps = make([]int, len(args))
+	for i, a := range args {
+		p, err := strconv.Atoi(a)
+		if err != nil {
+			return nil, errors.New("illegal port number")
+		}
+		ps[i] = p
+	}
+	return &Expose{Ports: ps}, nil
 }
 
 func ParseEnv(body []byte) (*Env, error) {

@@ -71,6 +71,33 @@ func TestParseMaintainer(t *testing.T) {
 	}
 }
 
+func TestParseExpose(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Expose
+	}{
+		{[]byte("22"), &Expose{Ports: []int{22}}},
+		{[]byte(" 22"), &Expose{Ports: []int{22}}},
+		{[]byte("22 "), &Expose{Ports: []int{22}}},
+		{[]byte("22 80"), &Expose{Ports: []int{22, 80}}},
+		{[]byte(" 22 80"), &Expose{Ports: []int{22, 80}}},
+		{[]byte("22 80 "), &Expose{Ports: []int{22, 80}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseExpose(c.in)
+		for i, p := range got.Ports {
+			if p != c.want.Ports[i] {
+				t.Errorf(
+					"ParseExpose(%q).Ports == %v, want %v",
+					c.in,
+					got.Ports,
+					c.want.Ports,
+				)
+			}
+		}
+	}
+}
+
 func TestParseUser(t *testing.T) {
 	cases := []struct {
 		in   []byte
