@@ -21,29 +21,8 @@ func TestParseFrom(t *testing.T) {
 	}
 	for _, c := range cases {
 		got, _ := ParseFrom(c.in)
-		if got.Image != c.want.Image {
-			t.Errorf(
-				"ParseFrom(%q).Image == %q, want %q",
-				c.in,
-				got.Image,
-				c.want.Image,
-			)
-		}
-		if got.Tag != c.want.Tag {
-			t.Errorf(
-				"ParseFrom(%q).Tag == %q, want %q",
-				c.in,
-				got.Tag,
-				c.want.Tag,
-			)
-		}
-		if got.Digest != c.want.Digest {
-			t.Errorf(
-				"ParseFrom(%q).Digest == %q, want %q",
-				c.in,
-				got.Digest,
-				c.want.Digest,
-			)
+		if *got != *c.want {
+			t.Errorf("ParseFrom(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -60,13 +39,8 @@ func TestParseMaintainer(t *testing.T) {
 	}
 	for _, c := range cases {
 		got, _ := ParseMaintainer(c.in)
-		if got.Name != c.want.Name {
-			t.Errorf(
-				"ParseMaintainer(%q).Name == %q, want %q",
-				c.in,
-				got.Name,
-				c.want.Name,
-			)
+		if *got != *c.want {
+			t.Errorf("ParseMaintainer(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -87,12 +61,7 @@ func TestParseExpose(t *testing.T) {
 		got, _ := ParseExpose(c.in)
 		for i, p := range got.Ports {
 			if p != c.want.Ports[i] {
-				t.Errorf(
-					"ParseExpose(%q).Ports == %v, want %v",
-					c.in,
-					got.Ports,
-					c.want.Ports,
-				)
+				t.Errorf("ParseExpose(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -109,13 +78,8 @@ func TestParseUser(t *testing.T) {
 	}
 	for _, c := range cases {
 		got, _ := ParseUser(c.in)
-		if got.Name != c.want.Name {
-			t.Errorf(
-				"ParseUser(%q).Name == %q, want %q",
-				c.in,
-				got.Name,
-				c.want.Name,
-			)
+		if *got != *c.want {
+			t.Errorf("ParseUser(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -131,13 +95,8 @@ func TestParseWorkdir(t *testing.T) {
 	}
 	for _, c := range cases {
 		got, _ := ParseWorkdir(c.in)
-		if got.Path != c.want.Path {
-			t.Errorf(
-				"ParseWorkdir(%q).Path == %q, want %q",
-				c.in,
-				got.Path,
-				c.want.Path,
-			)
+		if *got != *c.want {
+			t.Errorf("ParseWorkdir(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
