@@ -90,7 +90,11 @@ func ParseEntrypoint(body []byte) (*Entrypoint, error) {
 }
 
 func ParseVolume(body []byte) (*Volume, error) {
-	return nil, nil
+	ps, err := ParseJSONArray(string(body))
+	if err != nil {
+		return &Volume{Points: strings.Fields(string(body))}, nil
+	}
+	return &Volume{Points: ps}, nil
 }
 
 func ParseUser(body []byte) (*User, error) {

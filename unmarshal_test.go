@@ -67,6 +67,32 @@ func TestParseExpose(t *testing.T) {
 	}
 }
 
+func TestParseVolume(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Volume
+	}{
+		{[]byte("/opt"), &Volume{Points: []string{"/opt"}}},
+		{[]byte(" /opt"), &Volume{Points: []string{"/opt"}}},
+		{[]byte("/opt "), &Volume{Points: []string{"/opt"}}},
+		{[]byte("/opt /etc"), &Volume{Points: []string{"/opt", "/etc"}}},
+		{[]byte(" /opt /etc"), &Volume{Points: []string{"/opt", "/etc"}}},
+		{[]byte("/opt /etc "), &Volume{Points: []string{"/opt", "/etc"}}},
+		{[]byte("[\"/opt\"]"), &Volume{Points: []string{"/opt"}}},
+		{[]byte(" [ \"/opt\" ] "), &Volume{Points: []string{"/opt"}}},
+		{[]byte("[\"/opt\",\"/etc\"]"), &Volume{Points: []string{"/opt", "/etc"}}},
+		{[]byte(" [ \"/opt\", \"/etc\" ] "), &Volume{Points: []string{"/opt", "/etc"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseVolume(c.in)
+		for i, p := range got.Points {
+			if p != c.want.Points[i] {
+				t.Errorf("ParseVolume(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseUser(t *testing.T) {
 	cases := []struct {
 		in   []byte
