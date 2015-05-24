@@ -11,15 +11,15 @@ func LogicalLines([]byte) [][]byte {
 }
 
 func ParseJSONArray(s string) ([]string, error) {
-	body := TrimSpace(s)
-	if !strings.HasPrefix(body, "[") || !strings.HasSurfix(body, "]") {
+	body := strings.TrimSpace(s)
+	if !strings.HasPrefix(body, "[") || !strings.HasSuffix(body, "]") {
 		return nil, errors.New("unmatched '[' and ']'")
 	}
 	args := strings.Split(body[1:len(body)-1], ",")
 	for i, a := range args {
 		arg := strings.TrimSpace(a)
 		if !strings.HasPrefix(arg, "\"") ||
-			!strings.HasSurfix(arg, "\"") ||
+			!strings.HasSuffix(arg, "\"") ||
 			len(arg) <= 1 {
 			return nil, errors.New("unmatched '\"'")
 		}
