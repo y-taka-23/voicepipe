@@ -67,6 +67,32 @@ func TestParseExpose(t *testing.T) {
 	}
 }
 
+func TestParseAdd(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Add
+	}{
+		{[]byte("/src /dest"), &Add{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte(" /src /dest"), &Add{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("/src /dest "), &Add{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("[\"/src\",\"/dest\"]"), &Add{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte(" [ \"/src\", \"/dest\" ] "), &Add{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("/s1 /s2 /dest"), &Add{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
+		{[]byte("[\"/s1\",\"/s2\",\"/dest\"]"), &Add{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
+	}
+	for _, c := range cases {
+		got, _ := ParseAdd(c.in)
+		for i, s := range got.Sources {
+			if s != c.want.Sources[i] {
+				t.Errorf("ParseAdd(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+		if got.Destination != c.want.Destination {
+			t.Errorf("ParseAdd(%q) == %v, want %v", c.in, got, c.want)
+		}
+	}
+}
+
 func TestParseVolume(t *testing.T) {
 	cases := []struct {
 		in   []byte
