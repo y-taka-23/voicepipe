@@ -93,6 +93,32 @@ func TestParseAdd(t *testing.T) {
 	}
 }
 
+func TestParseCopy(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Copy
+	}{
+		{[]byte("/src /dest"), &Copy{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte(" /src /dest"), &Copy{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("/src /dest "), &Copy{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("[\"/src\",\"/dest\"]"), &Copy{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte(" [ \"/src\", \"/dest\" ] "), &Copy{Sources: []string{"/src"}, Destination: "/dest"}},
+		{[]byte("/s1 /s2 /dest"), &Copy{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
+		{[]byte("[\"/s1\",\"/s2\",\"/dest\"]"), &Copy{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
+	}
+	for _, c := range cases {
+		got, _ := ParseCopy(c.in)
+		for i, s := range got.Sources {
+			if s != c.want.Sources[i] {
+				t.Errorf("ParseCopy(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+		if got.Destination != c.want.Destination {
+			t.Errorf("ParseCopy(%q) == %v, want %v", c.in, got, c.want)
+		}
+	}
+}
+
 func TestParseVolume(t *testing.T) {
 	cases := []struct {
 		in   []byte

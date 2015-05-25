@@ -89,7 +89,14 @@ func ParseAdd(body []byte) (*Add, error) {
 }
 
 func ParseCopy(body []byte) (*Copy, error) {
-	return nil, nil
+	fs, err := ParseJSONArray(string(body))
+	if err != nil {
+		fs = strings.Fields(string(body))
+	}
+	if len(fs) == 0 {
+		return nil, errors.New("no destination directory")
+	}
+	return &Copy{Sources: fs[:len(fs)-1], Destination: fs[len(fs)-1]}, nil
 }
 
 func ParseEntrypoint(body []byte) (*Entrypoint, error) {
