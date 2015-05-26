@@ -49,7 +49,15 @@ func ParseMaintainer(body []byte) (*Maintainer, error) {
 }
 
 func ParseRun(body []byte) (*Run, error) {
-	return nil, nil
+	ts, err := ParseJSONArray(string(body))
+	if err == nil {
+		return &Run{Tokens: ts}, nil
+	}
+	ts = []string{"/bin/sh", "-c"}
+	for _, t := range strings.Fields(string(body)) {
+		ts = append(ts, t)
+	}
+	return &Run{Tokens: ts}, nil
 }
 
 func ParseCmd(body []byte) (*Cmd, error) {

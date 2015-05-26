@@ -45,6 +45,32 @@ func TestParseMaintainer(t *testing.T) {
 	}
 }
 
+func TestParseRun(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Run
+	}{
+		{[]byte("/bin/ls"), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte(" /bin/ls"), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/ls "), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/rm foo"), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte(" /bin/rm foo"), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("/bin/rm foo "), &Run{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("[\"/bin/ls\"]"), &Run{Tokens: []string{"/bin/ls"}}},
+		{[]byte(" [ \"/bin/ls\" ] "), &Run{Tokens: []string{"/bin/ls"}}},
+		{[]byte("[\"/bin/rm\",\"foo\"]"), &Run{Tokens: []string{"/bin/rm", "foo"}}},
+		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Run{Tokens: []string{"/bin/rm", "foo"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseRun(c.in)
+		for i, tok := range got.Tokens {
+			if tok != c.want.Tokens[i] {
+				t.Errorf("ParseRun(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseExpose(t *testing.T) {
 	cases := []struct {
 		in   []byte
