@@ -71,6 +71,32 @@ func TestParseRun(t *testing.T) {
 	}
 }
 
+func TestParseCmd(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Cmd
+	}{
+		{[]byte("/bin/ls"), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte(" /bin/ls"), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/ls "), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/rm foo"), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte(" /bin/rm foo"), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("/bin/rm foo "), &Cmd{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("[\"/bin/ls\"]"), &Cmd{Tokens: []string{"/bin/ls"}}},
+		{[]byte(" [ \"/bin/ls\" ] "), &Cmd{Tokens: []string{"/bin/ls"}}},
+		{[]byte("[\"/bin/rm\",\"foo\"]"), &Cmd{Tokens: []string{"/bin/rm", "foo"}}},
+		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Cmd{Tokens: []string{"/bin/rm", "foo"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseCmd(c.in)
+		for i, tok := range got.Tokens {
+			if tok != c.want.Tokens[i] {
+				t.Errorf("ParseCmd(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseExpose(t *testing.T) {
 	cases := []struct {
 		in   []byte
