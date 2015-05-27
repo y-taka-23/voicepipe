@@ -171,6 +171,32 @@ func TestParseCopy(t *testing.T) {
 	}
 }
 
+func TestParseEntrypoint(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Entrypoint
+	}{
+		{[]byte("/bin/ls"), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte(" /bin/ls"), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/ls "), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/ls"}}},
+		{[]byte("/bin/rm foo"), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte(" /bin/rm foo"), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("/bin/rm foo "), &Entrypoint{Tokens: []string{"/bin/sh", "-c", "/bin/rm", "foo"}}},
+		{[]byte("[\"/bin/ls\"]"), &Entrypoint{Tokens: []string{"/bin/ls"}}},
+		{[]byte(" [ \"/bin/ls\" ] "), &Entrypoint{Tokens: []string{"/bin/ls"}}},
+		{[]byte("[\"/bin/rm\",\"foo\"]"), &Entrypoint{Tokens: []string{"/bin/rm", "foo"}}},
+		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Entrypoint{Tokens: []string{"/bin/rm", "foo"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseEntrypoint(c.in)
+		for i, tok := range got.Tokens {
+			if tok != c.want.Tokens[i] {
+				t.Errorf("ParseEntrypoint(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseVolume(t *testing.T) {
 	cases := []struct {
 		in   []byte

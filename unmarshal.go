@@ -116,7 +116,15 @@ func ParseCopy(body []byte) (*Copy, error) {
 }
 
 func ParseEntrypoint(body []byte) (*Entrypoint, error) {
-	return nil, nil
+	ts, err := ParseJSONArray(string(body))
+	if err == nil {
+		return &Entrypoint{Tokens: ts}, nil
+	}
+	ts = []string{"/bin/sh", "-c"}
+	for _, t := range strings.Fields(string(body)) {
+		ts = append(ts, t)
+	}
+	return &Entrypoint{Tokens: ts}, nil
 }
 
 func ParseVolume(body []byte) (*Volume, error) {
