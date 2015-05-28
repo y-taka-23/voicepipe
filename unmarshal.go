@@ -72,7 +72,7 @@ func ParseCmd(body []byte) (*Cmd, error) {
 	return &Cmd{Tokens: ts}, nil
 }
 
-func ParseLable(body []byte) (*Label, error) {
+func ParseLabel(body []byte) (*Label, error) {
 	return nil, nil
 }
 
