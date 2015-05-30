@@ -97,6 +97,31 @@ func TestParseCmd(t *testing.T) {
 	}
 }
 
+func TestParseLabel(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Label
+	}{
+		{[]byte("foo=bar"), &Label{Labels: map[string]string{"foo": "bar"}}},
+		{[]byte(" foo=bar"), &Label{Labels: map[string]string{"foo": "bar"}}},
+		{[]byte("foo=bar "), &Label{Labels: map[string]string{"foo": "bar"}}},
+		{[]byte("foo=bar fizz=buzz"), &Label{Labels: map[string]string{"foo": "bar", "fizz": "buzz"}}},
+		{[]byte(" foo=bar fizz=buzz"), &Label{Labels: map[string]string{"foo": "bar", "fizz": "buzz"}}},
+		{[]byte("foo=bar fizz=buzz "), &Label{Labels: map[string]string{"foo": "bar", "fizz": "buzz"}}},
+		{[]byte("foo=\"b a r\""), &Label{Labels: map[string]string{"foo": "b a r"}}},
+		{[]byte("\"f o o\"=bar"), &Label{Labels: map[string]string{"f o o": "bar"}}},
+		{[]byte("\"f o o\"=\"b a r\""), &Label{Labels: map[string]string{"f o o": "b a r"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseLabel(c.in)
+		for k, v := range got.Labels {
+			if v != c.want.Labels[k] {
+				t.Errorf("ParseLabel(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseExpose(t *testing.T) {
 	cases := []struct {
 		in   []byte
