@@ -72,6 +72,18 @@ func ParseCmd(body []byte) (*Cmd, error) {
 	return &Cmd{Tokens: ts}, nil
 }
 
+func ParseQuotedString(src []byte) ([]byte, []byte, error) {
+	if len(src) == 0 || src[0] != '"' {
+		return nil, src, errors.New("unmatched '\"'")
+	}
+	for i := 1; i < len(src); i++ {
+		if src[i] == '"' {
+			return src[1 : i-1], src[i+1:], nil
+		}
+	}
+	return nil, src, errors.New("unmatched '\"'")
+}
+
 func ParseLabel(body []byte) (*Label, error) {
 	return nil, nil
 }
