@@ -85,7 +85,14 @@ func ParseQuotedString(src []byte) ([]byte, []byte, error) {
 }
 
 func ParseLabel(body []byte) (*Label, error) {
-	return nil, nil
+	var k, v string
+	var tail []byte
+	l, err := ParseLabel(tail)
+	if err != nil {
+		return nil, err
+	}
+	l.Lables[k] = v
+	return l, nil
 }
 
 func ParseExpose(body []byte) (*Expose, error) {
