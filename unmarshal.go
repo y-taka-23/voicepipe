@@ -72,26 +72,53 @@ func ParseCmd(body []byte) (*Cmd, error) {
 	return &Cmd{Tokens: ts}, nil
 }
 
-func ParseQuotedString(src []byte) ([]byte, []byte, error) {
-	if len(src) == 0 || src[0] != '"' {
-		return nil, src, errors.New("unmatched '\"'")
-	}
-	for i := 1; i < len(src); i++ {
-		if src[i] == '"' {
-			return src[1 : i-1], src[i+1:], nil
+func FetchKey(src []byte) (string, []byte, error) {
+	for i, b := range src {
+		if b == '=' {
+			return strings.Trim(string(src[:i]), " \""), src[i+1:], nil
 		}
 	}
-	return nil, src, errors.New("unmatched '\"'")
+	return "", nil, errors.New("missing '='")
+}
+
+func FetchValue(src []byte) (string, []byte, error) {
+	if len(src) == 0 {
+		return "", nil, errors.New("missing value")
+	}
+	if src[0] == '"' {
+		for i, b := range src[1:] {
+			if b == '"' {
+				return string(src[1:i]), src[i+1:], nil
+			}
+		}
+		return "", nil, errors.New("unmatched '\"'")
+	} else {
+		for i, b := range src {
+			if b == ' ' {
+				return string(src[:i]), src[i+1:], nil
+			}
+		}
+		return string(src), []byte{}, nil
+	}
 }
 
 func ParseLabel(body []byte) (*Label, error) {
-	var k, v string
-	var tail []byte
+	if !strings.Contains(string(body), "=") {
+		return &Label{Labels: map[string]string{}}, nil
+	}
+	k, t, err := FetchKey(body)
+	if err != nil {
+		return nil, err
+	}
+	v, tail, err := FetchValue(t)
+	if err != nil {
+		return nil, err
+	}
 	l, err := ParseLabel(tail)
 	if err != nil {
 		return nil, err
 	}
-	l.Lables[k] = v
+	l.Labels[k] = v
 	return l, nil
 }
 
