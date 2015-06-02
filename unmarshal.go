@@ -86,8 +86,8 @@ func FetchValue(src []byte) (string, []byte, error) {
 		return "", nil, errors.New("missing value")
 	}
 	if src[0] == '"' {
-		for i, b := range src[1:] {
-			if b == '"' {
+		for i := 1; i < len(src); i++ {
+			if src[i] == '"' {
 				return string(src[1:i]), src[i+1:], nil
 			}
 		}
