@@ -144,6 +144,33 @@ func TestParseExpose(t *testing.T) {
 	}
 }
 
+func TestParseEnv(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want *Env
+	}{
+		{[]byte("FOO bar"), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte(" FOO bar"), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte("FOO bar "), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte("FOO bar fizz buzz"), &Env{Variables: map[string]string{"FOO": "bar fizz buzz"}}},
+		{[]byte("FOO=bar"), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte(" FOO=bar"), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte("FOO=bar "), &Env{Variables: map[string]string{"FOO": "bar"}}},
+		{[]byte("FOO=bar FIZZ=buzz"), &Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}},
+		{[]byte("FOO=\"b a r\""), &Env{Variables: map[string]string{"FOO": "b a r"}}},
+		{[]byte("FOO=bar FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}},
+		{[]byte("FOO=\"b a r\" FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "b a r", "FIZZ": "b u z z"}}},
+	}
+	for _, c := range cases {
+		got, _ := ParseEnv(c.in)
+		for k, v := range got.Variables {
+			if c.want.Variables[k] != v {
+				t.Errorf("ParseEnv(%q) == %v, want %v", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseAdd(t *testing.T) {
 	cases := []struct {
 		in   []byte
