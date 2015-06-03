@@ -135,8 +135,43 @@ func ParseExpose(body []byte) (*Expose, error) {
 	return &Expose{Ports: ps}, nil
 }
 
+func ParseMultiEnv(body []byte) (*Env, error) {
+	if !strings.Contains(string(body), "=") {
+		return &Env{Variables: map[string]string{}}, nil
+	}
+	k, t, err := FetchKey(body)
+	if err != nil {
+		return nil, err
+	}
+	v, tail, err := FetchValue(t)
+	if err != nil {
+		return nil, err
+	}
+	e, err := ParseMultiEnv(tail)
+	if err != nil {
+		return nil, err
+	}
+	e.Variables[k] = v
+	return e, nil
+}
+
+func ParseSingleEnv(body []byte) (*Env, error) {
+	s := strings.TrimSpace(string(body))
+	i := strings.IndexAny(s, " \t")
+	if i < 0 || i >= len(s)-1 {
+		return nil, errors.New("missing value")
+	}
+	k := strings.TrimSpace(s[:i])
+	v := strings.TrimSpace(s[i+1:])
+	return &Env{Variables: map[string]string{k: v}}, nil
+}
+
 func ParseEnv(body []byte) (*Env, error) {
-	return nil, nil
+	if strings.Contains(string(body), "=") {
+		return ParseMultiEnv(body)
+	} else {
+		return ParseSingleEnv(body)
+	}
 }
 
 func ParseAdd(body []byte) (*Add, error) {
