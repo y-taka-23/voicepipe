@@ -158,7 +158,7 @@ func TestParseEnv(t *testing.T) {
 		{[]byte("FOO=bar "), &Env{Variables: map[string]string{"FOO": "bar"}}},
 		{[]byte("FOO=bar FIZZ=buzz"), &Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}},
 		{[]byte("FOO=\"b a r\""), &Env{Variables: map[string]string{"FOO": "b a r"}}},
-		{[]byte("FOO=bar FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}},
+		{[]byte("FOO=bar FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "b u z z"}}},
 		{[]byte("FOO=\"b a r\" FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "b a r", "FIZZ": "b u z z"}}},
 	}
 	for _, c := range cases {
