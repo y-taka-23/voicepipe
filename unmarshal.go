@@ -63,7 +63,7 @@ func ParseLine(line []byte) (Statement, error) {
 		return ParseUser(body)
 	case "WORKDIR":
 		return ParseWorkdir(body)
-	case "Onbuild":
+	case "ONBUILD":
 		return ParseOnbuild(body)
 	}
 	return nil, errors.New("illegal instruction")
