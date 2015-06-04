@@ -28,8 +28,45 @@ func ParseJSONArray(s string) ([]string, error) {
 	return args, nil
 }
 
-func Parse(args []byte) (*Statement, error) {
-	return nil, nil
+func ParseLine(line []byte) (Statement, error) {
+	s := string(line)
+	i := strings.IndexAny(s, " \t")
+	if i < 0 {
+		return nil, errors.New("missing argument")
+	}
+	instr := strings.ToUpper(s[:i])
+	body := line[i:]
+	switch instr {
+	case "FROM":
+		return ParseFrom(body)
+	case "MAINTAINER":
+		return ParseMaintainer(body)
+	case "RUN":
+		return ParseRun(body)
+	case "CMD":
+		return ParseCmd(body)
+	case "LABEL":
+		return ParseLabel(body)
+	case "EXPOSE":
+		return ParseExpose(body)
+	case "ENV":
+		return ParseEnv(body)
+	case "ADD":
+		return ParseAdd(body)
+	case "COPY":
+		return ParseCopy(body)
+	case "ENTRYPOINT":
+		return ParseEntrypoint(body)
+	case "VOLUME":
+		return ParseVolume(body)
+	case "USER":
+		return ParseUser(body)
+	case "WORKDIR":
+		return ParseWorkdir(body)
+	case "Onbuild":
+		return ParseOnbuild(body)
+	}
+	return nil, errors.New("illegal instruction")
 }
 
 func ParseFrom(body []byte) (*From, error) {
