@@ -264,7 +264,11 @@ func ParseWorkdir(body []byte) (*Workdir, error) {
 }
 
 func ParseOnbuild(body []byte) (*Onbuild, error) {
-	return nil, nil
+	st, err := ParseLine(body)
+	if err != nil {
+		return nil, err
+	}
+	return &Onbuild{Statement: st}, nil
 }
 
 func (df *Dockerfile) Unmarshal(src []byte) error {
