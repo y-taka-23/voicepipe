@@ -284,6 +284,17 @@ func ParseOnbuild(body []byte) (*Onbuild, error) {
 	return &Onbuild{Statement: st}, nil
 }
 
-func (df *Dockerfile) Unmarshal(src []byte) error {
-	return nil
+func Unmarshal(src []byte) (*Dockerfile, error) {
+	sts := []Statement{}
+	lines := LogicalLines(src)
+	for _, l := range lines {
+		if len(strings.TrimSpace(string(l))) != 0 {
+			st, err := ParseLine(l)
+			if err != nil {
+				return nil, err
+			}
+			sts = append(sts, st)
+		}
+	}
+	return &Dockerfile{Statements: sts}, nil
 }
