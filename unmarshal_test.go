@@ -4,6 +4,27 @@ import (
 	"testing"
 )
 
+func TestLogicalLines(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want [][]byte
+	}{
+		{[]byte("abcdef"), [][]byte{[]byte("abcdef")}},
+		{[]byte("abc\\\ndef"), [][]byte{[]byte("abcdef")}},
+		{[]byte("abc\ndef"), [][]byte{[]byte("abc"), []byte("def")}},
+	}
+	for _, c := range cases {
+		got := LogicalLines(c.in)
+		for i, bs := range got {
+			for j, b := range bs {
+				if b != c.want[i][j] {
+					t.Errorf("LogicalLines(%q) == %q, want %q", c.in, got, c.want)
+				}
+			}
+		}
+	}
+}
+
 func TestParseFrom(t *testing.T) {
 	cases := []struct {
 		in   []byte

@@ -2,12 +2,25 @@ package main
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-func LogicalLines([]byte) [][]byte {
-	return nil
+func LogicalLines(src []byte) [][]byte {
+	src = regexp.MustCompile("\\\\\n").ReplaceAll(src, []byte(""))
+	lines := [][]byte{}
+	head := 0
+	for i, b := range src {
+		if b == '\n' {
+			lines = append(lines, src[head:i])
+			head = i + 1
+		}
+	}
+	if head < len(src) {
+		lines = append(lines, src[head:])
+	}
+	return lines
 }
 
 func ParseJSONArray(s string) ([]string, error) {
