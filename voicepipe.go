@@ -82,7 +82,21 @@ func SetupWorkingDir(d Directive, root string) error {
 			return err
 		}
 		for _, fi := range rs {
-			err = os.Symlink(root+"/"+fi.Name(), dir+"/"+fi.Name())
+			if fi.Name() != "Dockerfile" {
+				err = os.Symlink(root+"/"+fi.Name(), dir+"/"+fi.Name())
+				if err != nil {
+					return err
+				}
+			}
+			buf, err := ioutil.ReadFile(root + "/Dockerfile")
+			if err != nil {
+				return err
+			}
+			df, err := Unmarshal(buf)
+			if err != nil {
+				return err
+			}
+			err = ioutil.WriteFile(dir+"/Dockerfile", df.Marshal(), 775)
 			if err != nil {
 				return err
 			}
