@@ -31,7 +31,7 @@ func (x Label) String() string {
 	res := make([]byte, 0)
 	res = append(res, "LABEL"...)
 	for k, v := range x.Labels {
-		res = append(res, fmt.Sprintf(" %s=%s", k, v)...)
+		res = append(res, fmt.Sprintf(" \"%s\"=\"%s\"", k, v)...)
 	}
 	return string(res)
 }
@@ -49,7 +49,7 @@ func (x Env) String() string {
 	res := make([]byte, 0)
 	res = append(res, "ENV"...)
 	for k, v := range x.Variables {
-		res = append(res, fmt.Sprintf(" %s=%s", k, v)...)
+		res = append(res, fmt.Sprintf(" %s=\"%s\"", k, v)...)
 	}
 	return string(res)
 }
