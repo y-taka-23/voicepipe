@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -49,18 +50,16 @@ func TestCmdString(t *testing.T) {
 }
 
 func TestLabelString(t *testing.T) {
-	cases := []struct {
-		in   Label
-		want string
-	}{
-		{Label{Labels: map[string]string{"foo": "bar", "fizz": "buzz"}}, "LABEL \"fizz\"=\"buzz\" \"foo\"=\"bar\""},
-		{Label{Labels: map[string]string{"fizz": "buzz", "foo": "bar"}}, "LABEL \"fizz\"=\"buzz\" \"foo\"=\"bar\""},
-	}
-	for _, c := range cases {
-		got := c.in.String()
-		if got != c.want {
-			t.Errorf("%v.String() == %q, want %q", c.in, got, c.want)
+	in := Label{Labels: map[string]string{"foo": "bar", "fizz": "buzz"}}
+	wants := []string{"\"foo\"=\"bar\"", "\"fizz\"=\"buzz\""}
+	got := in.String()
+	for _, w := range wants {
+		if !strings.Contains(got, w) {
+			t.Errorf("%v.String() should contain %q, but doesn't", in, w)
 		}
+	}
+	if strings.Count(got, "=") != len(wants) {
+		t.Errorf("%v.String() should contain exact %d key-value pairs, but doesn't", in, len(wants))
 	}
 }
 
@@ -74,18 +73,16 @@ func TestExposeString(t *testing.T) {
 }
 
 func TestEnvString(t *testing.T) {
-	cases := []struct {
-		in   Env
-		want string
-	}{
-		{Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}, "LABEL FIZZ=\"buzz\" FOO=\"bar\""},
-		{Env{Variables: map[string]string{"FIZZ": "buzz", "FOO": "bar"}}, "LABEL FIZZ=\"buzz\" FOO=\"bar\""},
-	}
-	for _, c := range cases {
-		got := c.in.String()
-		if got != c.want {
-			t.Errorf("%v.String() == %q, want %q", c.in, got, c.want)
+	in := Env{Variables: map[string]string{"FOO": "bar", "FIZZ": "buzz"}}
+	wants := []string{"FOO=\"bar\"", "FIZZ=\"buzz\""}
+	got := in.String()
+	for _, w := range wants {
+		if !strings.Contains(got, w) {
+			t.Errorf("%v.String() should contain %q, but doesn't", in, w)
 		}
+	}
+	if strings.Count(got, "=") != len(wants) {
+		t.Errorf("%v.String() should contain exact %d key-value pairs, but doesn't", in, len(wants))
 	}
 }
 
