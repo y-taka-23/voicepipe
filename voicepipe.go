@@ -95,6 +95,10 @@ func SetupWorkingDir(d Directive, root string) error {
 			if err != nil {
 				return err
 			}
+			// TODO: copying structures costs a lot
+			for k, v := range id.Parameters {
+				df = ReplaceEnv(*df, k, v)
+			}
 			err = ioutil.WriteFile(dir+"/Dockerfile", df.Marshal(), 775)
 			if err != nil {
 				return err
