@@ -36,7 +36,7 @@ func TestReplaceEnv(t *testing.T) {
 	for _, c := range cases {
 		df := ReplaceEnv(initialize(), c.key, c.value)
 		for _, st := range df.Statements {
-			if x, ok := st.(Env); ok {
+			if x, ok := st.(*Env); ok {
 				if x.Variables[c.key] != c.value {
 					t.Errorf("value of %q is %q, want %q ", c.key, x.Variables[c.key], c.value)
 				}
