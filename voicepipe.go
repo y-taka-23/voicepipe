@@ -82,7 +82,7 @@ func SetupWorkingDir(d Directive, root string) error {
 		}
 		for _, fi := range rs {
 			if fi.Name() != "Dockerfile" {
-				err = os.Symlink(root+"/"+fi.Name(), dir+"/"+fi.Name())
+				err = os.Link(root+"/"+fi.Name(), dir+"/"+fi.Name())
 				if err != nil {
 					return err
 				}
