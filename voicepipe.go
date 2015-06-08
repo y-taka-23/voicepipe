@@ -34,13 +34,12 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(in); err != nil {
 		return err
 	}
-
 	d.Repository = in.Repository
 	d.ImageDirectives = make([]*ImageDirective, 0)
 	for _, i := range in.Images {
 		params := make(map[string]string)
 		for _, p := range i.Parameters {
-			params[p.Name] = params[p.Value]
+			params[p.Name] = p.Value
 		}
 		d.ImageDirectives = append(
 			d.ImageDirectives,
