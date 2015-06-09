@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 )
 
 type ImageDirective struct {
@@ -108,6 +111,21 @@ func SetupWorkingDir(d Directive, root string) error {
 	return nil
 }
 
+func BuildImages(d Directive, root string, stdout, stderr io.Writer) error {
+	for _, id := range d.ImageDirectives {
+		dir := root + "/.voicepipe/" + id.Tag
+		tag := d.Repository + ":" + id.Tag
+		cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
+		cmd.Stdout = stdout
+		cmd.Stderr = stderr
+		err := cmd.Run()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func main() {
 	root, err := os.Getwd()
 	if err != nil {
@@ -130,6 +148,14 @@ func main() {
 	}
 
 	err = SetupWorkingDir(*d, root)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	stdout := bufio.NewWriter(os.Stdout)
+	stderr := bufio.NewWriter(os.Stderr)
+	err = BuildImages(*d, root, stdout, stderr)
 	if err != nil {
 		log.Println(err)
 		return
