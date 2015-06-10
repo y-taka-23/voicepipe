@@ -1,5 +1,10 @@
 package main
 
+import (
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+)
+
 type ImageDirective struct {
 	Tag        string
 	Parameters map[string]string
@@ -39,4 +44,17 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		)
 	}
 	return nil
+}
+
+func NewDirective(path string) (*Directive, error) {
+	buf, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var d = &Directive{}
+	err = yaml.Unmarshal(buf, d)
+	if err != nil {
+		return nil, err
+	}
+	return d, nil
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"log"
@@ -92,14 +91,7 @@ func main() {
 	}
 	root += "/example" // just for debug
 
-	buf, err := ioutil.ReadFile(root + "/voicepipe.yml")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	var d = &Directive{}
-	err = yaml.Unmarshal(buf, d)
+	d, err := NewDirective(root + "/voicepipe.yml")
 	if err != nil {
 		log.Println(err)
 		return
