@@ -2,13 +2,18 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 )
+
+type VoicePipe struct {
+}
+
+func NewVoicePipe() *VoicePipe {
+	return &VoicePipe{}
+}
 
 func Resources(root string) ([]os.FileInfo, error) {
 	rs := make([]os.FileInfo, 0)
@@ -83,33 +88,29 @@ func BuildImages(d Directive, root string, stdout, stderr io.Writer) error {
 	return nil
 }
 
-func main() {
+func (vp *VoicePipe) Run() error {
 	root, err := os.Getwd()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	root += "/example" // just for debug
 
 	d, err := NewDirective(root + "/voicepipe.yml")
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	err = SetupWorkingDir(*d, root)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	stdout := bufio.NewWriter(os.Stdout)
 	stderr := bufio.NewWriter(os.Stderr)
 	err = BuildImages(*d, root, stdout, stderr)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	fmt.Println("SUCCESS")
+	return nil
 }
