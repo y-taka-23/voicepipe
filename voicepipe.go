@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 )
 
 type VoicePipe struct {
@@ -37,7 +38,7 @@ func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
 }
 
 func (vp *VoicePipe) SetupWorkDirFor(id ImageDirective, rs []os.FileInfo) error {
-	dir := vp.RootDir + "/.voicepipe/" + id.Tag
+	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	if err := os.RemoveAll(dir); err != nil {
 		return err
 	}
@@ -46,12 +47,14 @@ func (vp *VoicePipe) SetupWorkDirFor(id ImageDirective, rs []os.FileInfo) error 
 	}
 	for _, fi := range rs {
 		if fi.Name() != "Dockerfile" {
-			if err := os.Link(vp.RootDir+"/"+fi.Name(), dir+"/"+fi.Name()); err != nil {
+			src := path.Join(vp.RootDir, fi.Name())
+			tgt := path.Join(dir, fi.Name())
+			if err := os.Link(src, tgt); err != nil {
 				return err
 			}
 			continue
 		}
-		buf, err := ioutil.ReadFile(vp.RootDir + "/" + fi.Name())
+		buf, err := ioutil.ReadFile(path.Join(vp.RootDir, fi.Name()))
 		if err != nil {
 			return err
 		}
@@ -84,7 +87,7 @@ func (vp *VoicePipe) SetupWorkingDir() error {
 }
 
 func (vp *VoicePipe) BuildImage(id ImageDirective, stdout, stderr io.Writer) error {
-	dir := vp.RootDir + "/.voicepipe/" + id.Tag
+	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	tag := vp.Directive.Repository + ":" + id.Tag
 	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
 	cmd.Stdout = stdout
