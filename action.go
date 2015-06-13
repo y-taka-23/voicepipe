@@ -5,10 +5,6 @@ import (
 	"log"
 )
 
-func BuildAction(c *cli.Context, root string) {
-	log.Println("BUILD")
-}
-
 func ListAction(c *cli.Context, root string) {
 	log.Println("LIST")
 }

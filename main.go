@@ -20,7 +20,16 @@ func main() {
 			Aliases: []string{"b"},
 			Usage:   "fill it later",
 			Action: func(c *cli.Context) {
-				BuildAction(c, root)
+				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if err := vp.SetupAll(); err != nil {
+					log.Fatal(err)
+				}
+				if err := vp.BuildAll(); err != nil {
+					log.Fatal(err)
+				}
 			},
 		},
 		{

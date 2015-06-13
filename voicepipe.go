@@ -112,15 +112,3 @@ func (vp *VoicePipe) BuildAll() error {
 	}
 	return nil
 }
-
-func (vp *VoicePipe) Run() error {
-	err := vp.SetupAll()
-	if err != nil {
-		return err
-	}
-	err = vp.BuildAll()
-	if err != nil {
-		return err
-	}
-	return nil
-}
