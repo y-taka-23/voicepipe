@@ -10,7 +10,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	vp, err := NewVoicePipe(root)
+	vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 	if err != nil {
 		log.Fatal(err)
 	}

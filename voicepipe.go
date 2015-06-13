@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"io"
 	"io/ioutil"
 	"os"
@@ -12,14 +11,21 @@ import (
 type VoicePipe struct {
 	RootDir   string
 	Directive *Directive
+	Stdout    io.Writer
+	Stderr    io.Writer
 }
 
-func NewVoicePipe(path string) (*VoicePipe, error) {
+func NewVoicePipe(path string, stdout, stderr io.Writer) (*VoicePipe, error) {
 	d, err := NewDirective(path)
 	if err != nil {
 		return nil, err
 	}
-	return &VoicePipe{RootDir: path, Directive: d}, nil
+	return &VoicePipe{
+		RootDir:   path,
+		Directive: d,
+		Stdout:    stdout,
+		Stderr:    stderr,
+	}, nil
 }
 
 func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
@@ -86,21 +92,21 @@ func (vp *VoicePipe) SetupWorkingDir() error {
 	return nil
 }
 
-func (vp *VoicePipe) BuildImage(id ImageDirective, stdout, stderr io.Writer) error {
+func (vp *VoicePipe) BuildImage(id ImageDirective) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	tag := vp.Directive.Repository + ":" + id.Tag
 	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+	cmd.Stdout = vp.Stdout
+	cmd.Stderr = vp.Stderr
 	if err := cmd.Run(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (vp *VoicePipe) BuildImages(stdout, stderr io.Writer) error {
+func (vp *VoicePipe) BuildImages() error {
 	for _, id := range vp.Directive.ImageDirectives {
-		if err := vp.BuildImage(*id, stdout, stderr); err != nil {
+		if err := vp.BuildImage(*id); err != nil {
 			return err
 		}
 	}
@@ -112,9 +118,7 @@ func (vp *VoicePipe) Run() error {
 	if err != nil {
 		return err
 	}
-	stdout := bufio.NewWriter(os.Stdout)
-	stderr := bufio.NewWriter(os.Stderr)
-	err = vp.BuildImages(stdout, stderr)
+	err = vp.BuildImages()
 	if err != nil {
 		return err
 	}
