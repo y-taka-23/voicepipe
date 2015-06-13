@@ -39,7 +39,11 @@ func main() {
 			Aliases: []string{"l"},
 			Usage:   "fill it later",
 			Action: func(c *cli.Context) {
-				ListAction(c, root)
+				vp, err := NewVoicePipe(path, os.Stdout, os.Stderr)
+				if err != nil {
+					log.Fatal(err)
+				}
+				vp.List()
 			},
 		},
 		{

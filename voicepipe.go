@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -111,4 +112,13 @@ func (vp *VoicePipe) BuildAll() error {
 		}
 	}
 	return nil
+}
+
+func (vp *VoicePipe) List() {
+	fmt.Fprint(vp.Stdout, "REPOSITORY:\n")
+	fmt.Fprintf(vp.Stdout, "   %s\n", vp.Directive.Repository)
+	fmt.Fprint(vp.Stdout, "TAGS:\n")
+	for _, id := range vp.Directive.ImageDirectives {
+		fmt.Fprintf(vp.Stdout, "   %s\n", id.Tag)
+	}
 }
