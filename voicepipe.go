@@ -43,7 +43,7 @@ func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
 	return rs, nil
 }
 
-func (vp *VoicePipe) SetupWorkDirFor(id ImageDirective, rs []os.FileInfo) error {
+func (vp *VoicePipe) Setup(id ImageDirective, rs []os.FileInfo) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	if err := os.RemoveAll(dir); err != nil {
 		return err
@@ -79,20 +79,20 @@ func (vp *VoicePipe) SetupWorkDirFor(id ImageDirective, rs []os.FileInfo) error 
 	return nil
 }
 
-func (vp *VoicePipe) SetupWorkingDir() error {
+func (vp *VoicePipe) SetupAll() error {
 	rs, err := vp.Resources()
 	if err != nil {
 		return err
 	}
 	for _, id := range vp.Directive.ImageDirectives {
-		if err := vp.SetupWorkDirFor(*id, rs); err != nil {
+		if err := vp.Setup(*id, rs); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (vp *VoicePipe) BuildImage(id ImageDirective) error {
+func (vp *VoicePipe) Build(id ImageDirective) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	tag := vp.Directive.Repository + ":" + id.Tag
 	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
@@ -104,7 +104,7 @@ func (vp *VoicePipe) BuildImage(id ImageDirective) error {
 	return nil
 }
 
-func (vp *VoicePipe) BuildImages() error {
+func (vp *VoicePipe) BuildAll() error {
 	for _, id := range vp.Directive.ImageDirectives {
 		if err := vp.BuildImage(*id); err != nil {
 			return err
@@ -114,11 +114,11 @@ func (vp *VoicePipe) BuildImages() error {
 }
 
 func (vp *VoicePipe) Run() error {
-	err := vp.SetupWorkingDir()
+	err := vp.SetupAll()
 	if err != nil {
 		return err
 	}
-	err = vp.BuildImages()
+	err = vp.BuildAll()
 	if err != nil {
 		return err
 	}
