@@ -83,15 +83,21 @@ func (vp *VoicePipe) SetupWorkingDir() error {
 	return nil
 }
 
+func (vp *VoicePipe) BuildImage(id ImageDirective, stdout, stderr io.Writer) error {
+	dir := vp.RootDir + "/.voicepipe/" + id.Tag
+	tag := vp.Directive.Repository + ":" + id.Tag
+	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (vp *VoicePipe) BuildImages(stdout, stderr io.Writer) error {
 	for _, id := range vp.Directive.ImageDirectives {
-		dir := vp.RootDir + "/.voicepipe/" + id.Tag
-		tag := vp.Directive.Repository + ":" + id.Tag
-		cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
-		cmd.Stdout = stdout
-		cmd.Stderr = stderr
-		err := cmd.Run()
-		if err != nil {
+		if err := vp.BuildImage(*id, stdout, stderr); err != nil {
 			return err
 		}
 	}
