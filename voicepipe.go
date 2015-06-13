@@ -15,7 +15,7 @@ func NewVoicePipe() *VoicePipe {
 	return &VoicePipe{}
 }
 
-func Resources(root string) ([]os.FileInfo, error) {
+func (vp *VoicePipe) Resources(root string) ([]os.FileInfo, error) {
 	rs := make([]os.FileInfo, 0)
 	fis, err := ioutil.ReadDir(root)
 	if err != nil {
@@ -30,8 +30,8 @@ func Resources(root string) ([]os.FileInfo, error) {
 	return rs, nil
 }
 
-func SetupWorkingDir(d Directive, root string) error {
-	rs, err := Resources(root)
+func (vp *VoicePipe) SetupWorkingDir(d Directive, root string) error {
+	rs, err := vp.Resources(root)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func SetupWorkingDir(d Directive, root string) error {
 	return nil
 }
 
-func BuildImages(d Directive, root string, stdout, stderr io.Writer) error {
+func (vp *VoicePipe) BuildImages(d Directive, root string, stdout, stderr io.Writer) error {
 	for _, id := range d.ImageDirectives {
 		dir := root + "/.voicepipe/" + id.Tag
 		tag := d.Repository + ":" + id.Tag
@@ -100,14 +100,14 @@ func (vp *VoicePipe) Run() error {
 		return err
 	}
 
-	err = SetupWorkingDir(*d, root)
+	err = vp.SetupWorkingDir(*d, root)
 	if err != nil {
 		return err
 	}
 
 	stdout := bufio.NewWriter(os.Stdout)
 	stderr := bufio.NewWriter(os.Stderr)
-	err = BuildImages(*d, root, stdout, stderr)
+	err = vp.BuildImages(*d, root, stdout, stderr)
 	if err != nil {
 		return err
 	}
