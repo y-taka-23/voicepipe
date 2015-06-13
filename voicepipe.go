@@ -16,13 +16,13 @@ type VoicePipe struct {
 	Stderr    io.Writer
 }
 
-func NewVoicePipe(path string, stdout, stderr io.Writer) (*VoicePipe, error) {
-	d, err := NewDirective(path)
+func NewVoicePipe(root string, stdout, stderr io.Writer) (*VoicePipe, error) {
+	d, err := NewDirective(path.Join(root, "voicepipe.yml"))
 	if err != nil {
 		return nil, err
 	}
 	return &VoicePipe{
-		RootDir:   path,
+		RootDir:   root,
 		Directive: d,
 		Stdout:    stdout,
 		Stderr:    stderr,
