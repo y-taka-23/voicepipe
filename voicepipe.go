@@ -9,15 +9,21 @@ import (
 )
 
 type VoicePipe struct {
+	RootDir   string
+	Directive *Directive
 }
 
-func NewVoicePipe() *VoicePipe {
-	return &VoicePipe{}
+func NewVoicePipe(path string) (*VoicePipe, error) {
+	d, err := NewDirective(path)
+	if err != nil {
+		return nil, err
+	}
+	return &VoicePipe{RootDir: path, Directive: d}, nil
 }
 
-func (vp *VoicePipe) Resources(root string) ([]os.FileInfo, error) {
+func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
 	rs := make([]os.FileInfo, 0)
-	fis, err := ioutil.ReadDir(root)
+	fis, err := ioutil.ReadDir(vp.RootDir)
 	if err != nil {
 		return rs, err
 	}
@@ -30,13 +36,13 @@ func (vp *VoicePipe) Resources(root string) ([]os.FileInfo, error) {
 	return rs, nil
 }
 
-func (vp *VoicePipe) SetupWorkingDir(d Directive, root string) error {
-	rs, err := vp.Resources(root)
+func (vp *VoicePipe) SetupWorkingDir() error {
+	rs, err := vp.Resources()
 	if err != nil {
 		return err
 	}
-	for _, id := range d.ImageDirectives {
-		dir := root + "/.voicepipe/" + id.Tag
+	for _, id := range vp.Directive.ImageDirectives {
+		dir := vp.RootDir + "/.voicepipe/" + id.Tag
 		err = os.RemoveAll(dir)
 		if err != nil {
 			return err
@@ -47,12 +53,12 @@ func (vp *VoicePipe) SetupWorkingDir(d Directive, root string) error {
 		}
 		for _, fi := range rs {
 			if fi.Name() != "Dockerfile" {
-				err = os.Link(root+"/"+fi.Name(), dir+"/"+fi.Name())
+				err = os.Link(vp.RootDir+"/"+fi.Name(), dir+"/"+fi.Name())
 				if err != nil {
 					return err
 				}
 			}
-			buf, err := ioutil.ReadFile(root + "/Dockerfile")
+			buf, err := ioutil.ReadFile(vp.RootDir + "/Dockerfile")
 			if err != nil {
 				return err
 			}
@@ -73,10 +79,10 @@ func (vp *VoicePipe) SetupWorkingDir(d Directive, root string) error {
 	return nil
 }
 
-func (vp *VoicePipe) BuildImages(d Directive, root string, stdout, stderr io.Writer) error {
-	for _, id := range d.ImageDirectives {
-		dir := root + "/.voicepipe/" + id.Tag
-		tag := d.Repository + ":" + id.Tag
+func (vp *VoicePipe) BuildImages(stdout, stderr io.Writer) error {
+	for _, id := range vp.Directive.ImageDirectives {
+		dir := vp.RootDir + "/.voicepipe/" + id.Tag
+		tag := vp.Directive.Repository + ":" + id.Tag
 		cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
 		cmd.Stdout = stdout
 		cmd.Stderr = stderr
@@ -89,28 +95,15 @@ func (vp *VoicePipe) BuildImages(d Directive, root string, stdout, stderr io.Wri
 }
 
 func (vp *VoicePipe) Run() error {
-	root, err := os.Getwd()
+	err := vp.SetupWorkingDir()
 	if err != nil {
 		return err
 	}
-	root += "/example" // just for debug
-
-	d, err := NewDirective(root + "/voicepipe.yml")
-	if err != nil {
-		return err
-	}
-
-	err = vp.SetupWorkingDir(*d, root)
-	if err != nil {
-		return err
-	}
-
 	stdout := bufio.NewWriter(os.Stdout)
 	stderr := bufio.NewWriter(os.Stderr)
-	err = vp.BuildImages(*d, root, stdout, stderr)
+	err = vp.BuildImages(stdout, stderr)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
