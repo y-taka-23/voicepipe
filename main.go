@@ -4,6 +4,7 @@ import (
 	"github.com/codegangsta/cli"
 	"log"
 	"os"
+	"path"
 )
 
 func main() {
@@ -11,6 +12,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	path := path.Join(root, "voicepipe.yml")
 	app := cli.NewApp()
 	app.Name = "voicepipe"
 	app.Usage = "build parameterized Docker images"
@@ -20,7 +22,7 @@ func main() {
 			Aliases: []string{"b"},
 			Usage:   "fill it later",
 			Action: func(c *cli.Context) {
-				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
+				vp, err := NewVoicePipe(path, os.Stdout, os.Stderr)
 				if err != nil {
 					log.Fatal(err)
 				}
