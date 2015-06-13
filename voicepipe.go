@@ -122,3 +122,15 @@ func (vp *VoicePipe) List() {
 		fmt.Fprintf(vp.Stdout, "   %s\n", id.Tag)
 	}
 }
+
+func (vp *VoicePipe) CleanAll() error {
+	dir := path.Join(vp.RootDir, ".voicepipe")
+	if _, err := os.Stat(dir); err == nil {
+		// the directory does not exist
+		return nil
+	}
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
+	return nil
+}

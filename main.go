@@ -51,7 +51,13 @@ func main() {
 			Aliases: []string{"c"},
 			Usage:   "fill it later",
 			Action: func(c *cli.Context) {
-				CleanAction(c, root)
+				vp, err := NewVoicePipe(path, os.Stdout, os.Stderr)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if err := vp.CleanAll(); err != nil {
+					log.Fatal(err)
+				}
 			},
 		},
 	}
