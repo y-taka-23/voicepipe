@@ -106,7 +106,7 @@ func (vp *VoicePipe) Build(id ImageDirective) error {
 
 func (vp *VoicePipe) BuildAll() error {
 	for _, id := range vp.Directive.ImageDirectives {
-		if err := vp.BuildImage(*id); err != nil {
+		if err := vp.Build(*id); err != nil {
 			return err
 		}
 	}
