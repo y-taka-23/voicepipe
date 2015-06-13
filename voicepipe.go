@@ -36,44 +36,48 @@ func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
 	return rs, nil
 }
 
+func (vp *VoicePipe) SetupWorkDirFor(id ImageDirective, rs []os.FileInfo) error {
+	dir := vp.RootDir + "/.voicepipe/" + id.Tag
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0775); err != nil {
+		return err
+	}
+	for _, fi := range rs {
+		if fi.Name() != "Dockerfile" {
+			if err := os.Link(vp.RootDir+"/"+fi.Name(), dir+"/"+fi.Name()); err != nil {
+				return err
+			}
+			continue
+		}
+		buf, err := ioutil.ReadFile(vp.RootDir + "/" + fi.Name())
+		if err != nil {
+			return err
+		}
+		df, err := Unmarshal(buf)
+		if err != nil {
+			return err
+		}
+		// TODO: copying structures costs a lot
+		for k, v := range id.Parameters {
+			df = ReplaceEnv(*df, k, v)
+		}
+		if err := ioutil.WriteFile(fi.Name(), df.Marshal(), 775); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (vp *VoicePipe) SetupWorkingDir() error {
 	rs, err := vp.Resources()
 	if err != nil {
 		return err
 	}
 	for _, id := range vp.Directive.ImageDirectives {
-		dir := vp.RootDir + "/.voicepipe/" + id.Tag
-		err = os.RemoveAll(dir)
-		if err != nil {
+		if err := vp.SetupWorkDirFor(*id, rs); err != nil {
 			return err
-		}
-		err = os.MkdirAll(dir, 0775)
-		if err != nil {
-			return err
-		}
-		for _, fi := range rs {
-			if fi.Name() != "Dockerfile" {
-				err = os.Link(vp.RootDir+"/"+fi.Name(), dir+"/"+fi.Name())
-				if err != nil {
-					return err
-				}
-			}
-			buf, err := ioutil.ReadFile(vp.RootDir + "/Dockerfile")
-			if err != nil {
-				return err
-			}
-			df, err := Unmarshal(buf)
-			if err != nil {
-				return err
-			}
-			// TODO: copying structures costs a lot
-			for k, v := range id.Parameters {
-				df = ReplaceEnv(*df, k, v)
-			}
-			err = ioutil.WriteFile(dir+"/Dockerfile", df.Marshal(), 775)
-			if err != nil {
-				return err
-			}
 		}
 	}
 	return nil
