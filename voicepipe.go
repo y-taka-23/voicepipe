@@ -125,7 +125,7 @@ func (vp *VoicePipe) List() {
 
 func (vp *VoicePipe) CleanAll() error {
 	dir := path.Join(vp.RootDir, ".voicepipe")
-	if _, err := os.Stat(dir); err == nil {
+	if _, err := os.Stat(dir); err != nil {
 		// the directory does not exist
 		return nil
 	}
