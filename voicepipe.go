@@ -117,10 +117,12 @@ func (vp *VoicePipe) BuildAll() error {
 func (vp *VoicePipe) List() {
 	fmt.Fprint(vp.Stdout, "REPOSITORY:\n")
 	fmt.Fprintf(vp.Stdout, "   %s\n", vp.Directive.Repository)
+	fmt.Fprint(vp.Stdout, "\n")
 	fmt.Fprint(vp.Stdout, "TAGS:\n")
 	for _, id := range vp.Directive.ImageDirectives {
-		fmt.Fprintf(vp.Stdout, "   %s\n", id.Tag)
+		fmt.Fprintf(vp.Stdout, "   %s\t%s\n", id.Tag, id.Description)
 	}
+	fmt.Fprint(vp.Stdout, "\n")
 }
 
 func (vp *VoicePipe) CleanAll() error {

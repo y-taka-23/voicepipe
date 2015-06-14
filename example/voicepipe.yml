@@ -1,10 +1,12 @@
 repository: user/nginx
 images:
   - tag: develop
+    description: "for the development environment"
     parameters:
       - name: INDEX_HTML
         value: index_develop.html
   - tag: production
+    description: "for the production environment"
     parameters:
       - name: INDEX_HTML
         value: index_production.html

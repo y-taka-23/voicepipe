@@ -6,8 +6,9 @@ import (
 )
 
 type ImageDirective struct {
-	Tag        string
-	Parameters map[string]string
+	Tag         string
+	Description string
+	Parameters  map[string]string
 }
 
 type Directive struct {
@@ -18,8 +19,9 @@ type Directive struct {
 type intermediateDirective struct {
 	Repository string
 	Images     []struct {
-		Tag        string
-		Parameters []struct {
+		Tag         string
+		Description string
+		Parameters  []struct {
 			Name  string
 			Value string
 		}
@@ -40,7 +42,11 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		}
 		d.ImageDirectives = append(
 			d.ImageDirectives,
-			&ImageDirective{Tag: i.Tag, Parameters: params},
+			&ImageDirective{
+				Tag:         i.Tag,
+				Description: i.Description,
+				Parameters:  params,
+			},
 		)
 	}
 	return nil
