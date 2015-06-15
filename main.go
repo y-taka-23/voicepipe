@@ -1,15 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"github.com/codegangsta/cli"
-	"log"
 	"os"
 )
 
 func main() {
 	root, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	app := cli.NewApp()
 	app.Name = "voicepipe"
@@ -22,13 +23,16 @@ func main() {
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 				if err := vp.SetupAll(); err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 				if err := vp.BuildAll(); err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 			},
 		},
@@ -39,7 +43,8 @@ func main() {
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 				vp.List()
 			},
@@ -51,10 +56,12 @@ func main() {
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 				if err := vp.CleanAll(); err != nil {
-					log.Fatal(err)
+					fmt.Fprintln(os.Stderr, err)
+					os.Exit(1)
 				}
 			},
 		},
