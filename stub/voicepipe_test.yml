@@ -1,0 +1,13 @@
+repository: user/app
+images:
+  - tag: tag_1
+    description: "description 1"
+    parameters:
+      - name: NAME_1
+        value: value_1
+  - tag: tag_2
+    description: "description 2"
+    parameters:
+      - name: NAME_2
+        value: value_2
+
