@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -79,7 +80,7 @@ func ParseLine(line []byte) (Statement, error) {
 	case "ONBUILD":
 		return ParseOnbuild(body)
 	}
-	return nil, errors.New("illegal instruction")
+	return nil, fmt.Errorf("illegal instruction '%s'", instr)
 }
 
 func ParseFrom(body []byte) (*From, error) {
