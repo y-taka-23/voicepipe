@@ -1,0 +1,16 @@
+FROM ubuntu:14.04
+MAINTAINER John Doe <johnd@example.com>
+
+# this is a comment.
+RUN mkdir -p /goroot && \
+    curl https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz \
+    | tar xvzf - -C /goroot
+
+ENV GOROOT /goroot
+ENV GOPATH /gopath
+ENV PATH ${GOROOT}/bin:${GOPATH}/bin:${PATH}
+
+WORKDIR /gopath # this is a comment, too
+
+CMD ["bash"]
+

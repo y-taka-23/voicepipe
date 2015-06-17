@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"testing"
 )
 
@@ -328,4 +329,13 @@ func TestParseWorkdir(t *testing.T) {
 			t.Errorf("ParseWorkdir(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
+}
+
+func TestUnmarshal(t *testing.T) {
+	in, _ := ioutil.ReadFile("stub/DockerfileTest")
+	_, err := Unmarshal(in)
+	if err != nil {
+		t.Errorf("Unmarshal(%q) returns %s", in, err)
+	}
+	// TODO test the contents
 }
