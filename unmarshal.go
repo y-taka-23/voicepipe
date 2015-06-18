@@ -298,8 +298,9 @@ func Unmarshal(src []byte) (*Dockerfile, error) {
 	sts := []Statement{}
 	lines := LogicalLines(src)
 	for _, l := range lines {
-		if len(strings.TrimSpace(string(l))) != 0 {
-			st, err := ParseLine(l)
+		content := TrimComment(l)
+		if len(strings.TrimSpace(string(content))) != 0 {
+			st, err := ParseLine(content)
 			if err != nil {
 				return nil, err
 			}
