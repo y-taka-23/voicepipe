@@ -26,6 +26,25 @@ func TestLogicalLines(t *testing.T) {
 	}
 }
 
+func TestTrimComment(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want []byte
+	}{
+		{[]byte("foo#bar"), []byte("foo")},
+		{[]byte("foobar"), []byte("foobar")},
+		{[]byte("#foo#bar"), []byte("")},
+	}
+	for _, c := range cases {
+		got := TrimComment(c.in)
+		for i, b := range got {
+			if b != c.want[i] {
+				t.Errorf("TrimComment(%q) == %q, want %q", c.in, got, c.want)
+			}
+		}
+	}
+}
+
 func TestParseFrom(t *testing.T) {
 	cases := []struct {
 		in   []byte

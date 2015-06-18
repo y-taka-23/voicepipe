@@ -24,6 +24,15 @@ func LogicalLines(src []byte) [][]byte {
 	return lines
 }
 
+func TrimComment(line []byte) []byte {
+	for i, b := range line {
+		if b == '#' {
+			return line[:i]
+		}
+	}
+	return line
+}
+
 func ParseJSONArray(s string) ([]string, error) {
 	body := strings.TrimSpace(s)
 	if !strings.HasPrefix(body, "[") || !strings.HasSuffix(body, "]") {
