@@ -14,12 +14,12 @@ func main() {
 	}
 	app := cli.NewApp()
 	app.Name = "voicepipe"
-	app.Usage = "build parameterized Docker images"
+	app.Usage = "Build parameterized Docker images from a single Dockerfile"
 	app.Commands = []cli.Command{
 		{
 			Name:    "build",
 			Aliases: []string{"b"},
-			Usage:   "fill it later",
+			Usage:   "Builds parameterized Docker images",
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
@@ -39,7 +39,7 @@ func main() {
 		{
 			Name:    "list",
 			Aliases: []string{"l"},
-			Usage:   "fill it later",
+			Usage:   "Shows a list of tags",
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
@@ -52,7 +52,7 @@ func main() {
 		{
 			Name:    "clean",
 			Aliases: []string{"c"},
-			Usage:   "fill it later",
+			Usage:   "Cleans temporary files up",
 			Action: func(c *cli.Context) {
 				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
