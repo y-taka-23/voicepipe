@@ -115,6 +115,17 @@ func (vp *VoicePipe) buildAll() error {
 	return nil
 }
 
+func (vp *VoicePipe) buildLatest() error {
+	repo := vp.Directive.Repository
+	cmd := exec.Command("docker", "build", "--rm", "-t", repo, vp.RootDir)
+	cmd.Stdout = vp.Stdout
+	cmd.Stderr = vp.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (vp *VoicePipe) list() {
 	fmt.Fprint(vp.Stdout, "REPOSITORY:\n")
 	fmt.Fprintf(vp.Stdout, "   %s\n", vp.Directive.Repository)

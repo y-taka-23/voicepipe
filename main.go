@@ -20,6 +20,12 @@ func main() {
 			Name:    "build",
 			Aliases: []string{"b"},
 			Usage:   "Builds parameterized Docker images",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "latest, L",
+					Usage: "build an original Dockerfile as the latest image",
+				},
+			},
 			Action: func(c *cli.Context) {
 				vp, err := newVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
@@ -33,6 +39,12 @@ func main() {
 				if err := vp.buildAll(); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
+				}
+				if c.Bool("latest") {
+					if err := vp.buildLatest(); err != nil {
+						fmt.Fprintln(os.Stderr, err)
+						os.Exit(1)
+					}
 				}
 			},
 		},
