@@ -19,7 +19,7 @@ func TestLogicalLines(t *testing.T) {
 		for i, bs := range got {
 			for j, b := range bs {
 				if b != c.want[i][j] {
-					t.Errorf("LogicalLines(%q) == %q, want %q", c.in, got, c.want)
+					t.Errorf("logicalLines(%q) == %q, want %q", c.in, got, c.want)
 				}
 			}
 		}
@@ -39,7 +39,7 @@ func TestTrimComment(t *testing.T) {
 		got := trimComment(c.in)
 		for i, b := range got {
 			if b != c.want[i] {
-				t.Errorf("TrimComment(%q) == %q, want %q", c.in, got, c.want)
+				t.Errorf("trimComment(%q) == %q, want %q", c.in, got, c.want)
 			}
 		}
 	}
@@ -63,7 +63,7 @@ func TestParseFrom(t *testing.T) {
 	for _, c := range cases {
 		got, _ := parseFrom(c.in)
 		if *got != *c.want {
-			t.Errorf("ParseFrom(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseFrom(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -81,7 +81,7 @@ func TestParseMaintainer(t *testing.T) {
 	for _, c := range cases {
 		got, _ := parseMaintainer(c.in)
 		if *got != *c.want {
-			t.Errorf("ParseMaintainer(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseMaintainer(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -106,7 +106,7 @@ func TestParseRun(t *testing.T) {
 		got, _ := parseRun(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
-				t.Errorf("ParseRun(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseRun(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -132,7 +132,7 @@ func TestParseCmd(t *testing.T) {
 		got, _ := parseCmd(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
-				t.Errorf("ParseCmd(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseCmd(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -157,7 +157,7 @@ func TestParseLabel(t *testing.T) {
 		got, _ := parseLabel(c.in)
 		for k, v := range got.Labels {
 			if v != c.want.Labels[k] {
-				t.Errorf("ParseLabel(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseLabel(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -179,7 +179,7 @@ func TestParseExpose(t *testing.T) {
 		got, _ := parseExpose(c.in)
 		for i, p := range got.Ports {
 			if p != c.want.Ports[i] {
-				t.Errorf("ParseExpose(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseExpose(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -206,7 +206,7 @@ func TestParseEnv(t *testing.T) {
 		got, _ := parseEnv(c.in)
 		for k, v := range got.Variables {
 			if c.want.Variables[k] != v {
-				t.Errorf("ParseEnv(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseEnv(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -229,11 +229,11 @@ func TestParseAdd(t *testing.T) {
 		got, _ := parseAdd(c.in)
 		for i, s := range got.Sources {
 			if s != c.want.Sources[i] {
-				t.Errorf("ParseAdd(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseAdd(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 		if got.Destination != c.want.Destination {
-			t.Errorf("ParseAdd(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseAdd(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -255,11 +255,11 @@ func TestParseCopy(t *testing.T) {
 		got, _ := parseCopy(c.in)
 		for i, s := range got.Sources {
 			if s != c.want.Sources[i] {
-				t.Errorf("ParseCopy(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseCopy(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 		if got.Destination != c.want.Destination {
-			t.Errorf("ParseCopy(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseCopy(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -284,7 +284,7 @@ func TestParseEntrypoint(t *testing.T) {
 		got, _ := parseEntrypoint(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
-				t.Errorf("ParseEntrypoint(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseEntrypoint(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -310,7 +310,7 @@ func TestParseVolume(t *testing.T) {
 		got, _ := parseVolume(c.in)
 		for i, p := range got.Points {
 			if p != c.want.Points[i] {
-				t.Errorf("ParseVolume(%q) == %v, want %v", c.in, got, c.want)
+				t.Errorf("parseVolume(%q) == %v, want %v", c.in, got, c.want)
 			}
 		}
 	}
@@ -328,7 +328,7 @@ func TestParseUser(t *testing.T) {
 	for _, c := range cases {
 		got, _ := parseUser(c.in)
 		if *got != *c.want {
-			t.Errorf("ParseUser(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseUser(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -345,7 +345,7 @@ func TestParseWorkdir(t *testing.T) {
 	for _, c := range cases {
 		got, _ := parseWorkdir(c.in)
 		if *got != *c.want {
-			t.Errorf("ParseWorkdir(%q) == %v, want %v", c.in, got, c.want)
+			t.Errorf("parseWorkdir(%q) == %v, want %v", c.in, got, c.want)
 		}
 	}
 }
@@ -354,7 +354,7 @@ func TestUnmarshal(t *testing.T) {
 	in, _ := ioutil.ReadFile("stub/DockerfileTest")
 	_, err := unmarshal(in)
 	if err != nil {
-		t.Errorf("Unmarshal(%q) returns %s", in, err)
+		t.Errorf("unmarshal(%q) returns %s", in, err)
 	}
 	// TODO test the contents
 }
