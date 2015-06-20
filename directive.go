@@ -28,7 +28,7 @@ type intermediateDirective struct {
 	}
 }
 
-func (d *Directive) unmarshalYAML(unmarshal func(interface{}) error) error {
+func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var in = &intermediateDirective{}
 	if err := unmarshal(in); err != nil {
 		return err
