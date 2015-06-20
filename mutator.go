@@ -1,11 +1,18 @@
 package main
 
-func replaceEnv(df Dockerfile, k, v string) *Dockerfile {
+func replaceEnv(df Dockerfile, key, value string) *Dockerfile {
 	sts := []Statement{}
 	for _, st := range df.Statements {
-		if x, ok := st.(*Env); ok {
-			x.Variables[k] = v
-			sts = append(sts, x)
+		if env, ok := st.(*Env); ok {
+			vs := map[string]string{}
+			for k, v := range env.Variables {
+				if k == key {
+					vs[key] = value
+				} else {
+					vs[k] = v
+				}
+			}
+			sts = append(sts, Env{Variables: vs})
 		} else {
 			sts = append(sts, st)
 		}
