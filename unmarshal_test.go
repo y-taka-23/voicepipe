@@ -15,7 +15,7 @@ func TestLogicalLines(t *testing.T) {
 		{[]byte("abc\ndef"), [][]byte{[]byte("abc"), []byte("def")}},
 	}
 	for _, c := range cases {
-		got := LogicalLines(c.in)
+		got := logicalLines(c.in)
 		for i, bs := range got {
 			for j, b := range bs {
 				if b != c.want[i][j] {
@@ -36,7 +36,7 @@ func TestTrimComment(t *testing.T) {
 		{[]byte("#foo#bar"), []byte("")},
 	}
 	for _, c := range cases {
-		got := TrimComment(c.in)
+		got := trimComment(c.in)
 		for i, b := range got {
 			if b != c.want[i] {
 				t.Errorf("TrimComment(%q) == %q, want %q", c.in, got, c.want)
@@ -61,7 +61,7 @@ func TestParseFrom(t *testing.T) {
 		{[]byte("ubuntu@12345 "), &From{Image: "ubuntu", Digest: "12345"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseFrom(c.in)
+		got, _ := parseFrom(c.in)
 		if *got != *c.want {
 			t.Errorf("ParseFrom(%q) == %v, want %v", c.in, got, c.want)
 		}
@@ -79,7 +79,7 @@ func TestParseMaintainer(t *testing.T) {
 		{[]byte("John Doe "), &Maintainer{Name: "John Doe"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseMaintainer(c.in)
+		got, _ := parseMaintainer(c.in)
 		if *got != *c.want {
 			t.Errorf("ParseMaintainer(%q) == %v, want %v", c.in, got, c.want)
 		}
@@ -103,7 +103,7 @@ func TestParseRun(t *testing.T) {
 		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Run{Tokens: []string{"/bin/rm", "foo"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseRun(c.in)
+		got, _ := parseRun(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
 				t.Errorf("ParseRun(%q) == %v, want %v", c.in, got, c.want)
@@ -129,7 +129,7 @@ func TestParseCmd(t *testing.T) {
 		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Cmd{Tokens: []string{"/bin/rm", "foo"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseCmd(c.in)
+		got, _ := parseCmd(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
 				t.Errorf("ParseCmd(%q) == %v, want %v", c.in, got, c.want)
@@ -154,7 +154,7 @@ func TestParseLabel(t *testing.T) {
 		{[]byte("\"f o o\"=\"b a r\""), &Label{Labels: map[string]string{"f o o": "b a r"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseLabel(c.in)
+		got, _ := parseLabel(c.in)
 		for k, v := range got.Labels {
 			if v != c.want.Labels[k] {
 				t.Errorf("ParseLabel(%q) == %v, want %v", c.in, got, c.want)
@@ -176,7 +176,7 @@ func TestParseExpose(t *testing.T) {
 		{[]byte("22 80 "), &Expose{Ports: []int{22, 80}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseExpose(c.in)
+		got, _ := parseExpose(c.in)
 		for i, p := range got.Ports {
 			if p != c.want.Ports[i] {
 				t.Errorf("ParseExpose(%q) == %v, want %v", c.in, got, c.want)
@@ -203,7 +203,7 @@ func TestParseEnv(t *testing.T) {
 		{[]byte("FOO=\"b a r\" FIZZ=\"b u z z\""), &Env{Variables: map[string]string{"FOO": "b a r", "FIZZ": "b u z z"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseEnv(c.in)
+		got, _ := parseEnv(c.in)
 		for k, v := range got.Variables {
 			if c.want.Variables[k] != v {
 				t.Errorf("ParseEnv(%q) == %v, want %v", c.in, got, c.want)
@@ -226,7 +226,7 @@ func TestParseAdd(t *testing.T) {
 		{[]byte("[\"/s1\",\"/s2\",\"/dest\"]"), &Add{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseAdd(c.in)
+		got, _ := parseAdd(c.in)
 		for i, s := range got.Sources {
 			if s != c.want.Sources[i] {
 				t.Errorf("ParseAdd(%q) == %v, want %v", c.in, got, c.want)
@@ -252,7 +252,7 @@ func TestParseCopy(t *testing.T) {
 		{[]byte("[\"/s1\",\"/s2\",\"/dest\"]"), &Copy{Sources: []string{"/s1", "/s2"}, Destination: "/dest"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseCopy(c.in)
+		got, _ := parseCopy(c.in)
 		for i, s := range got.Sources {
 			if s != c.want.Sources[i] {
 				t.Errorf("ParseCopy(%q) == %v, want %v", c.in, got, c.want)
@@ -281,7 +281,7 @@ func TestParseEntrypoint(t *testing.T) {
 		{[]byte(" [ \"/bin/rm\", \"foo\" ] "), &Entrypoint{Tokens: []string{"/bin/rm", "foo"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseEntrypoint(c.in)
+		got, _ := parseEntrypoint(c.in)
 		for i, tok := range got.Tokens {
 			if tok != c.want.Tokens[i] {
 				t.Errorf("ParseEntrypoint(%q) == %v, want %v", c.in, got, c.want)
@@ -307,7 +307,7 @@ func TestParseVolume(t *testing.T) {
 		{[]byte(" [ \"/opt\", \"/etc\" ] "), &Volume{Points: []string{"/opt", "/etc"}}},
 	}
 	for _, c := range cases {
-		got, _ := ParseVolume(c.in)
+		got, _ := parseVolume(c.in)
 		for i, p := range got.Points {
 			if p != c.want.Points[i] {
 				t.Errorf("ParseVolume(%q) == %v, want %v", c.in, got, c.want)
@@ -326,7 +326,7 @@ func TestParseUser(t *testing.T) {
 		{[]byte("root "), &User{Name: "root"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseUser(c.in)
+		got, _ := parseUser(c.in)
 		if *got != *c.want {
 			t.Errorf("ParseUser(%q) == %v, want %v", c.in, got, c.want)
 		}
@@ -343,7 +343,7 @@ func TestParseWorkdir(t *testing.T) {
 		{[]byte("/home/foo "), &Workdir{Path: "/home/foo"}},
 	}
 	for _, c := range cases {
-		got, _ := ParseWorkdir(c.in)
+		got, _ := parseWorkdir(c.in)
 		if *got != *c.want {
 			t.Errorf("ParseWorkdir(%q) == %v, want %v", c.in, got, c.want)
 		}
@@ -352,7 +352,7 @@ func TestParseWorkdir(t *testing.T) {
 
 func TestUnmarshal(t *testing.T) {
 	in, _ := ioutil.ReadFile("stub/DockerfileTest")
-	_, err := Unmarshal(in)
+	_, err := unmarshal(in)
 	if err != nil {
 		t.Errorf("Unmarshal(%q) returns %s", in, err)
 	}

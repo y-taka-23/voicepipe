@@ -91,7 +91,7 @@ func (x Onbuild) String() string {
 }
 
 // TODO: appending here is not so effective
-func (df *Dockerfile) Marshal() []byte {
+func (df *Dockerfile) marshal() []byte {
 	res := make([]byte, 0)
 	for _, st := range df.Statements {
 		res = append(res, fmt.Sprintln(st)...)

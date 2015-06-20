@@ -28,7 +28,7 @@ type intermediateDirective struct {
 	}
 }
 
-func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (d *Directive) unmarshalYAML(unmarshal func(interface{}) error) error {
 	var in = &intermediateDirective{}
 	if err := unmarshal(in); err != nil {
 		return err
@@ -52,7 +52,7 @@ func (d *Directive) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
-func NewDirective(path string) (*Directive, error) {
+func newDirective(path string) (*Directive, error) {
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err

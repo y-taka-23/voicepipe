@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func LogicalLines(src []byte) [][]byte {
+func logicalLines(src []byte) [][]byte {
 	src = regexp.MustCompile("\\\\\n").ReplaceAll(src, []byte(""))
 	lines := [][]byte{}
 	head := 0
@@ -24,7 +24,7 @@ func LogicalLines(src []byte) [][]byte {
 	return lines
 }
 
-func TrimComment(line []byte) []byte {
+func trimComment(line []byte) []byte {
 	for i, b := range line {
 		if b == '#' {
 			return line[:i]
@@ -33,7 +33,7 @@ func TrimComment(line []byte) []byte {
 	return line
 }
 
-func ParseJSONArray(s string) ([]string, error) {
+func parseJSONArray(s string) ([]string, error) {
 	body := strings.TrimSpace(s)
 	if !strings.HasPrefix(body, "[") || !strings.HasSuffix(body, "]") {
 		return nil, errors.New("unmatched '[' and ']'")
@@ -51,7 +51,7 @@ func ParseJSONArray(s string) ([]string, error) {
 	return args, nil
 }
 
-func ParseLine(line []byte) (Statement, error) {
+func parseLine(line []byte) (Statement, error) {
 	s := string(line)
 	i := strings.IndexAny(s, " \t")
 	if i < 0 {
@@ -61,38 +61,38 @@ func ParseLine(line []byte) (Statement, error) {
 	body := line[i:]
 	switch instr {
 	case "FROM":
-		return ParseFrom(body)
+		return parseFrom(body)
 	case "MAINTAINER":
-		return ParseMaintainer(body)
+		return parseMaintainer(body)
 	case "RUN":
-		return ParseRun(body)
+		return parseRun(body)
 	case "CMD":
-		return ParseCmd(body)
+		return parseCmd(body)
 	case "LABEL":
-		return ParseLabel(body)
+		return parseLabel(body)
 	case "EXPOSE":
-		return ParseExpose(body)
+		return parseExpose(body)
 	case "ENV":
-		return ParseEnv(body)
+		return parseEnv(body)
 	case "ADD":
-		return ParseAdd(body)
+		return parseAdd(body)
 	case "COPY":
-		return ParseCopy(body)
+		return parseCopy(body)
 	case "ENTRYPOINT":
-		return ParseEntrypoint(body)
+		return parseEntrypoint(body)
 	case "VOLUME":
-		return ParseVolume(body)
+		return parseVolume(body)
 	case "USER":
-		return ParseUser(body)
+		return parseUser(body)
 	case "WORKDIR":
-		return ParseWorkdir(body)
+		return parseWorkdir(body)
 	case "ONBUILD":
-		return ParseOnbuild(body)
+		return parseOnbuild(body)
 	}
 	return nil, fmt.Errorf("illegal instruction '%s'", instr)
 }
 
-func ParseFrom(body []byte) (*From, error) {
+func parseFrom(body []byte) (*From, error) {
 	s := strings.TrimSpace(string(body))
 	if args := strings.Split(s, "@"); len(args) >= 2 {
 		return &From{Image: args[0], Digest: args[1]}, nil
@@ -103,13 +103,13 @@ func ParseFrom(body []byte) (*From, error) {
 	return &From{Image: s}, nil
 }
 
-func ParseMaintainer(body []byte) (*Maintainer, error) {
+func parseMaintainer(body []byte) (*Maintainer, error) {
 	s := strings.TrimSpace(string(body))
 	return &Maintainer{Name: s}, nil
 }
 
-func ParseRun(body []byte) (*Run, error) {
-	ts, err := ParseJSONArray(string(body))
+func parseRun(body []byte) (*Run, error) {
+	ts, err := parseJSONArray(string(body))
 	if err == nil {
 		return &Run{Tokens: ts}, nil
 	}
@@ -120,8 +120,8 @@ func ParseRun(body []byte) (*Run, error) {
 	return &Run{Tokens: ts}, nil
 }
 
-func ParseCmd(body []byte) (*Cmd, error) {
-	ts, err := ParseJSONArray(string(body))
+func parseCmd(body []byte) (*Cmd, error) {
+	ts, err := parseJSONArray(string(body))
 	if err == nil {
 		return &Cmd{Tokens: ts}, nil
 	}
@@ -132,7 +132,7 @@ func ParseCmd(body []byte) (*Cmd, error) {
 	return &Cmd{Tokens: ts}, nil
 }
 
-func FetchKey(src []byte) (string, []byte, error) {
+func fetchKey(src []byte) (string, []byte, error) {
 	for i, b := range src {
 		if b == '=' {
 			return strings.Trim(string(src[:i]), " \""), src[i+1:], nil
@@ -141,7 +141,7 @@ func FetchKey(src []byte) (string, []byte, error) {
 	return "", nil, errors.New("missing '='")
 }
 
-func FetchValue(src []byte) (string, []byte, error) {
+func fetchValue(src []byte) (string, []byte, error) {
 	if len(src) == 0 {
 		return "", nil, errors.New("missing value")
 	}
@@ -162,19 +162,19 @@ func FetchValue(src []byte) (string, []byte, error) {
 	}
 }
 
-func ParseLabel(body []byte) (*Label, error) {
+func parseLabel(body []byte) (*Label, error) {
 	if !strings.Contains(string(body), "=") {
 		return &Label{Labels: map[string]string{}}, nil
 	}
-	k, t, err := FetchKey(body)
+	k, t, err := fetchKey(body)
 	if err != nil {
 		return nil, err
 	}
-	v, tail, err := FetchValue(t)
+	v, tail, err := fetchValue(t)
 	if err != nil {
 		return nil, err
 	}
-	l, err := ParseLabel(tail)
+	l, err := parseLabel(tail)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func ParseLabel(body []byte) (*Label, error) {
 	return l, nil
 }
 
-func ParseExpose(body []byte) (*Expose, error) {
+func parseExpose(body []byte) (*Expose, error) {
 	args := strings.Fields(string(body))
 	var ps = make([]int, len(args))
 	for i, a := range args {
@@ -195,19 +195,19 @@ func ParseExpose(body []byte) (*Expose, error) {
 	return &Expose{Ports: ps}, nil
 }
 
-func ParseMultiEnv(body []byte) (*Env, error) {
+func parseMultiEnv(body []byte) (*Env, error) {
 	if !strings.Contains(string(body), "=") {
 		return &Env{Variables: map[string]string{}}, nil
 	}
-	k, t, err := FetchKey(body)
+	k, t, err := fetchKey(body)
 	if err != nil {
 		return nil, err
 	}
-	v, tail, err := FetchValue(t)
+	v, tail, err := fetchValue(t)
 	if err != nil {
 		return nil, err
 	}
-	e, err := ParseMultiEnv(tail)
+	e, err := parseMultiEnv(tail)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func ParseMultiEnv(body []byte) (*Env, error) {
 	return e, nil
 }
 
-func ParseSingleEnv(body []byte) (*Env, error) {
+func parseSingleEnv(body []byte) (*Env, error) {
 	s := strings.TrimSpace(string(body))
 	i := strings.IndexAny(s, " \t")
 	if i < 0 || i >= len(s)-1 {
@@ -226,16 +226,16 @@ func ParseSingleEnv(body []byte) (*Env, error) {
 	return &Env{Variables: map[string]string{k: v}}, nil
 }
 
-func ParseEnv(body []byte) (*Env, error) {
+func parseEnv(body []byte) (*Env, error) {
 	if strings.Contains(string(body), "=") {
-		return ParseMultiEnv(body)
+		return parseMultiEnv(body)
 	} else {
-		return ParseSingleEnv(body)
+		return parseSingleEnv(body)
 	}
 }
 
-func ParseAdd(body []byte) (*Add, error) {
-	fs, err := ParseJSONArray(string(body))
+func parseAdd(body []byte) (*Add, error) {
+	fs, err := parseJSONArray(string(body))
 	if err != nil {
 		fs = strings.Fields(string(body))
 	}
@@ -245,8 +245,8 @@ func ParseAdd(body []byte) (*Add, error) {
 	return &Add{Sources: fs[:len(fs)-1], Destination: fs[len(fs)-1]}, nil
 }
 
-func ParseCopy(body []byte) (*Copy, error) {
-	fs, err := ParseJSONArray(string(body))
+func parseCopy(body []byte) (*Copy, error) {
+	fs, err := parseJSONArray(string(body))
 	if err != nil {
 		fs = strings.Fields(string(body))
 	}
@@ -256,8 +256,8 @@ func ParseCopy(body []byte) (*Copy, error) {
 	return &Copy{Sources: fs[:len(fs)-1], Destination: fs[len(fs)-1]}, nil
 }
 
-func ParseEntrypoint(body []byte) (*Entrypoint, error) {
-	ts, err := ParseJSONArray(string(body))
+func parseEntrypoint(body []byte) (*Entrypoint, error) {
+	ts, err := parseJSONArray(string(body))
 	if err == nil {
 		return &Entrypoint{Tokens: ts}, nil
 	}
@@ -268,39 +268,39 @@ func ParseEntrypoint(body []byte) (*Entrypoint, error) {
 	return &Entrypoint{Tokens: ts}, nil
 }
 
-func ParseVolume(body []byte) (*Volume, error) {
-	ps, err := ParseJSONArray(string(body))
+func parseVolume(body []byte) (*Volume, error) {
+	ps, err := parseJSONArray(string(body))
 	if err != nil {
 		return &Volume{Points: strings.Fields(string(body))}, nil
 	}
 	return &Volume{Points: ps}, nil
 }
 
-func ParseUser(body []byte) (*User, error) {
+func parseUser(body []byte) (*User, error) {
 	s := strings.TrimSpace(string(body))
 	return &User{Name: s}, nil
 }
 
-func ParseWorkdir(body []byte) (*Workdir, error) {
+func parseWorkdir(body []byte) (*Workdir, error) {
 	s := strings.TrimSpace(string(body))
 	return &Workdir{Path: s}, nil
 }
 
-func ParseOnbuild(body []byte) (*Onbuild, error) {
-	st, err := ParseLine(body)
+func parseOnbuild(body []byte) (*Onbuild, error) {
+	st, err := parseLine(body)
 	if err != nil {
 		return nil, err
 	}
 	return &Onbuild{Statement: st}, nil
 }
 
-func Unmarshal(src []byte) (*Dockerfile, error) {
+func unmarshal(src []byte) (*Dockerfile, error) {
 	sts := []Statement{}
-	lines := LogicalLines(src)
+	lines := logicalLines(src)
 	for _, l := range lines {
-		content := TrimComment(l)
+		content := trimComment(l)
 		if len(strings.TrimSpace(string(content))) != 0 {
-			st, err := ParseLine(content)
+			st, err := parseLine(content)
 			if err != nil {
 				return nil, err
 			}

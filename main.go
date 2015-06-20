@@ -21,16 +21,16 @@ func main() {
 			Aliases: []string{"b"},
 			Usage:   "Builds parameterized Docker images",
 			Action: func(c *cli.Context) {
-				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
+				vp, err := newVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
-				if err := vp.SetupAll(); err != nil {
+				if err := vp.setupAll(); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
-				if err := vp.BuildAll(); err != nil {
+				if err := vp.buildAll(); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
@@ -41,12 +41,12 @@ func main() {
 			Aliases: []string{"l"},
 			Usage:   "Shows a list of tags",
 			Action: func(c *cli.Context) {
-				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
+				vp, err := newVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
-				vp.List()
+				vp.list()
 			},
 		},
 		{
@@ -54,12 +54,12 @@ func main() {
 			Aliases: []string{"c"},
 			Usage:   "Cleans temporary files up",
 			Action: func(c *cli.Context) {
-				vp, err := NewVoicePipe(root, os.Stdout, os.Stderr)
+				vp, err := newVoicePipe(root, os.Stdout, os.Stderr)
 				if err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}
-				if err := vp.CleanAll(); err != nil {
+				if err := vp.cleanAll(); err != nil {
 					fmt.Fprintln(os.Stderr, err)
 					os.Exit(1)
 				}

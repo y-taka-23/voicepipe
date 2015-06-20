@@ -16,8 +16,8 @@ type VoicePipe struct {
 	Stderr    io.Writer
 }
 
-func NewVoicePipe(root string, stdout, stderr io.Writer) (*VoicePipe, error) {
-	d, err := NewDirective(path.Join(root, "voicepipe.yml"))
+func newVoicePipe(root string, stdout, stderr io.Writer) (*VoicePipe, error) {
+	d, err := newDirective(path.Join(root, "voicepipe.yml"))
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func NewVoicePipe(root string, stdout, stderr io.Writer) (*VoicePipe, error) {
 	}, nil
 }
 
-func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
+func (vp *VoicePipe) resources() ([]os.FileInfo, error) {
 	rs := make([]os.FileInfo, 0)
 	fis, err := ioutil.ReadDir(vp.RootDir)
 	if err != nil {
@@ -44,7 +44,7 @@ func (vp *VoicePipe) Resources() ([]os.FileInfo, error) {
 	return rs, nil
 }
 
-func (vp *VoicePipe) Setup(id ImageDirective, rs []os.FileInfo) error {
+func (vp *VoicePipe) setup(id ImageDirective, rs []os.FileInfo) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	if err := os.RemoveAll(dir); err != nil {
 		return err
@@ -65,36 +65,36 @@ func (vp *VoicePipe) Setup(id ImageDirective, rs []os.FileInfo) error {
 		if err != nil {
 			return err
 		}
-		df, err := Unmarshal(buf)
+		df, err := unmarshal(buf)
 		if err != nil {
 			return err
 		}
 		// TODO: copying structures costs a lot
 		for k, v := range id.Parameters {
-			df = ReplaceEnv(*df, k, v)
+			df = replaceEnv(*df, k, v)
 		}
 		tgt := path.Join(dir, fi.Name())
-		if err := ioutil.WriteFile(tgt, df.Marshal(), 775); err != nil {
+		if err := ioutil.WriteFile(tgt, df.marshal(), 775); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (vp *VoicePipe) SetupAll() error {
-	rs, err := vp.Resources()
+func (vp *VoicePipe) setupAll() error {
+	rs, err := vp.resources()
 	if err != nil {
 		return err
 	}
 	for _, id := range vp.Directive.ImageDirectives {
-		if err := vp.Setup(*id, rs); err != nil {
+		if err := vp.setup(*id, rs); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (vp *VoicePipe) Build(id ImageDirective) error {
+func (vp *VoicePipe) build(id ImageDirective) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
 	tag := vp.Directive.Repository + ":" + id.Tag
 	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
@@ -106,16 +106,16 @@ func (vp *VoicePipe) Build(id ImageDirective) error {
 	return nil
 }
 
-func (vp *VoicePipe) BuildAll() error {
+func (vp *VoicePipe) buildAll() error {
 	for _, id := range vp.Directive.ImageDirectives {
-		if err := vp.Build(*id); err != nil {
+		if err := vp.build(*id); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (vp *VoicePipe) List() {
+func (vp *VoicePipe) list() {
 	fmt.Fprint(vp.Stdout, "REPOSITORY:\n")
 	fmt.Fprintf(vp.Stdout, "   %s\n", vp.Directive.Repository)
 	fmt.Fprint(vp.Stdout, "\n")
@@ -126,7 +126,7 @@ func (vp *VoicePipe) List() {
 	fmt.Fprint(vp.Stdout, "\n")
 }
 
-func (vp *VoicePipe) CleanAll() error {
+func (vp *VoicePipe) cleanAll() error {
 	dir := path.Join(vp.RootDir, ".voicepipe")
 	if _, err := os.Stat(dir); err != nil {
 		// the directory does not exist

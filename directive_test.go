@@ -25,7 +25,7 @@ func TestNewDirective(t *testing.T) {
 			},
 		},
 	}
-	got, err := NewDirective(in)
+	got, err := newDirective(in)
 	if err != nil {
 		t.Errorf("NewDirective(%s) returns %s", in, err)
 	}
