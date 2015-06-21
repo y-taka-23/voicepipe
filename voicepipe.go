@@ -96,10 +96,11 @@ func (vp *VoicePipe) setupAll() error {
 
 func (vp *VoicePipe) build(id ImageDirective) error {
 	dir := path.Join(vp.RootDir, ".voicepipe", id.Tag)
-	tag := vp.Directive.Repository + ":" + id.Tag
-	cmd := exec.Command("docker", "build", "--rm", "-t", tag, dir)
+	fullName := vp.Directive.Repository + ":" + id.Tag
+	cmd := exec.Command("docker", "build", "--rm", "-t", fullName, dir)
 	cmd.Stdout = vp.Stdout
 	cmd.Stderr = vp.Stderr
+	vp.showHeader(vp.Directive.Repository, id.Tag)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -120,10 +121,17 @@ func (vp *VoicePipe) buildLatest() error {
 	cmd := exec.Command("docker", "build", "--rm", "-t", repo, vp.RootDir)
 	cmd.Stdout = vp.Stdout
 	cmd.Stderr = vp.Stderr
+	vp.showHeader(repo, "latest")
 	if err := cmd.Run(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (vp *VoicePipe) showHeader(repo, tag string) {
+	fmt.Fprintln(vp.Stdout, "-------------------------------------------------------------------------------")
+	fmt.Fprintf(vp.Stdout, "[VoicePipe] Building image %s:%s\n", repo, tag)
+	fmt.Fprintln(vp.Stdout, "-------------------------------------------------------------------------------")
 }
 
 func (vp *VoicePipe) list() {
