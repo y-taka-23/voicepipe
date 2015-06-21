@@ -15,6 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "voicepipe"
 	app.Usage = "Build parameterized Docker images from a single Dockerfile"
+	app.Version = "0.1.0"
 	app.Commands = []cli.Command{
 		{
 			Name:    "build",
