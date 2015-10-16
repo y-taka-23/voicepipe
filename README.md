@@ -1,4 +1,6 @@
-# VoicePipe [![Build Status](https://travis-ci.org/y-taka-23/voicepipe.svg)](https://travis-ci.org/y-taka-23/voicepipe)
+# VoicePipe
+
+[![Build Status](https://travis-ci.org/y-taka-23/voicepipe.svg)](https://travis-ci.org/y-taka-23/voicepipe)
 
 Build parameterized Docker images from a single Dockerfile.
 
